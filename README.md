@@ -2,7 +2,7 @@
 
 ```
 Consider the job description in the README.md, and update resume.tex to match the requirements of this new job description of this new company. In the following sections add the technology and that's required by the job.
-- Uncomment the "Summary" that best fits the role (e.g. ML Engineer, Data scientist), and change it.
+- In the section "SUMMARY" pick the best fits the role (e.g. ML Engineer, Data scientist), uncomment it, and change it.
 - Update the "Work Experience". Do not invent a new work position, update the positions at "ABB" and "Fondazione Bruno Kessler"  only change their description.
 - The changes have to be subtile, keep the description of the same idea and only slightly modify the phrases.
 ```
