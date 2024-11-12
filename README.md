@@ -1,12 +1,11 @@
 # Commands
 
 ```
-Consider the job description in the README.md, and update resume.tex to match the requirements of this new job description of this new company. In the following sections add the technology and that's required by the job, and remove the technology that you think is unnecessary.
+Consider the job description in the README.md, and update resume.tex to match the requirements of this new job description of this new company. In the following sections add the technology and that's required by the job.
 - Uncomment the "Summary" that best fits the role (e.g. ML Engineer, Data scientist), and change it.
 - Update the "Work Experience". Do not invent a new work position, update the positions at "ABB" and "Fondazione Bruno Kessler"  only change their description.
 - The changes have to be subtile, keep the description of the same idea and only slightly modify the phrases.
 ```
-
 
 ```
 Good. Now do the same for "Education" and "Relevant Technologies".
@@ -18,6 +17,11 @@ Good. Now do the same for "Education" and "Relevant Technologies".
 Good. Now comment the projects which are irrelevant. Uncomment the ones are relevant.
 - Keep only 3 projects.
 ```
+
+```
+Good. Now change the \position to what you think it's the most suitable.
+```
+
 
 # Job description
 
