@@ -4,3 +4,7 @@
 *.fls
 *.log
 *.pdf
+*.out
+*.synctex.gz
+.aider*
+.env

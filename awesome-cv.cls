@@ -606,6 +606,8 @@
   \vspace{-2.0mm}
   \setlength\tabcolsep{0pt}
   \setlength{\extrarowheight}{0pt}
+  \ifthenelse{\isundefined{\@recipientname}}{\def\@recipientname{}}{}
+  \ifthenelse{\isundefined{\@recipientaddress}}{\def\@recipientaddress{}}{}
   \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} L{\textwidth - 4.5cm} R{4.5cm}}
     \ifempty{#2#3}
       {\entrypositionstyle{#1} & \entrydatestyle{#4} \\}
