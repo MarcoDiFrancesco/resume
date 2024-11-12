@@ -1,0 +1,324 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+% Awesome CV LaTeX Template for CV/Resume
+%
+% This template has been downloaded from:
+% https://github.com/posquit0/Awesome-CV
+%
+% Author:
+% Claud D. Park <posquit0.bj@gmail.com>
+% http://www.posquit0.com
+%
+% Template license:
+% CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+%
+
+
+%-------------------------------------------------------------------------------
+% CONFIGURATIONS
+%-------------------------------------------------------------------------------
+% A4 paper size by default, use 'letterpaper' for US letter
+\documentclass[11pt, a4paper]{awesome-cv}
+
+% Configure page margins with geometry
+\geometry{left=1.4cm, top=.8cm, right=1.4cm, bottom=1.8cm, footskip=.5cm}
+
+% Specify the location of the included fonts
+\fontdir[fonts/]
+
+% Color for highlights
+% Awesome Colors: awesome-emerald, awesome-skyblue, awesome-red, awesome-pink, awesome-orange
+%                 awesome-nephritis, awesome-concrete, awesome-darknight
+\colorlet{awesome}{awesome-red}
+% Uncomment if you would like to specify your own color
+% \definecolor{awesome}{HTML}{CA63A8}
+
+% Colors for text
+% Uncomment if you would like to specify your own color
+% \definecolor{darktext}{HTML}{414141}
+% \definecolor{text}{HTML}{333333}
+% \definecolor{graytext}{HTML}{5D5D5D}
+% \definecolor{lighttext}{HTML}{999999}
+
+% Set false if you don't want to highlight section with awesome color
+\setbool{acvSectionColorHighlight}{true}
+
+% If you would like to change the social information separator from a pipe (|) to something else
+\renewcommand{\acvHeaderSocialSep}{\quad\textbar\quad}
+
+
+%-------------------------------------------------------------------------------
+%	PERSONAL INFORMATION
+%	Comment any of the lines below if they are not required
+%-------------------------------------------------------------------------------
+% Available options: circle|rectangle,edge/noedge,left/right
+\photo[circle,noedge,left]{./assets/Picture CV-2.jpg}
+\name{Marco}{Di Francesco}
+% \position{Data Scientist{\enskip\cdotp\enskip}Machine Learning Engineer}
+\position{Machine Learning Engineer}
+\address{Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark}
+% \address{Resedastrasse 23, 8008 Zürich, Switzerland}
+
+% === Link from Integrand
+% \email{Known by Integrand}
+% === Normal Links
+% \mobile{+39 3476692467}
+\mobile{\emoji{flag-denmark} +45 91839615}
+\email{marcodifran@gmail.com}
+% \github{marcodifrancesco}
+\linkedin{MarcoDiFran}
+\homepage{marcodifrancesco.com}
+% === Other Links
+% \gitlab{gitlab-id}
+% \stackoverflow{SO-id}{SO-name}
+% \twitter{@twit}
+% \skype{skype-id}
+% \reddit{reddit-id}
+% \medium{madium-id}
+% \googlescholar{googlescholar-id}{name-to-display}
+%% \firstname and \lastname will be used
+% \googlescholar{googlescholar-id}{}
+% \extrainfo{extra informations}
+
+% \quote{``Be the change that you want to see in the world."}
+%-------------------------------------------------------------------------------
+\begin{document}
+
+
+% Print the header with above personal informations
+% Give optional argument to change alignment(C: center, L: left, R: right)
+\makecvheader[R]
+
+% Print the footer with 3 arguments(<left>, <center>, <right>)
+% Leave any of these blank if they are not needed
+\makecvfooter
+  {\today}
+  {Marco Di Francesco~~~·~~~Résumé}
+  {}
+
+
+%==== SUMMARY
+% \cvsection{Summary}
+
+\begin{cvparagraph}
+\setemojifont{TwemojiMozilla}
+
+
+% => ML Engineer
+% I have the equivalent of 2 years of full-time experience as an ML Engineer, collaborating closely with data scientists to deploy ML models using PyTorch in production environments with CI/CD pipelines. My responsibilities included maintaining and troubleshooting models in production, both on-premises and on cloud platforms such as GCP and AWS.
+
+% I have 2 years of full-time experience as a Machine Learning Engineer, working closely with data scientists to deploy machine learning (ML) models for weather forecasting in production environments, using PyTorch and CI/CD pipelines. My responsibilities involved developing and training nowcasting models for short-term weather forecasting, both on-premises and on cloud platforms like GCP and AWS. Additionally, I have extensive experience in high-performance computing (HPC) and have worked with large-scale datasets in production.
+
+
+% => Data scientist
+% I have multiple years of experience as a data scientist in a research context, collaborating closely with PhDs to design, develop, and deploy deep learning models for computer vision in the fields of weather forecasting and biomedicine for long-term projects. My responsibilities included designing model architecture, developing in PyTorch, and implementing evaluation pipelines in Azure. Moreover, in the past year, I worked on researching and implementing an efficient learning model in Rust to handle streaming data in the robotic context at ABB.
+
+I have several years of experience as a data scientist, specializing in developing and deploying deep learning models for computer vision applications, particularly in weather forecasting and biomedicine. My expertise includes designing model architectures, developing in Python with frameworks like PyTorch, and implementing cloud-based pipelines in Azure. I have experience with real-time data processing using Rust and have worked with Docker and Kubernetes to deploy scalable machine learning models. Additionally, I am well-versed in the latest advancements in machine learning, particularly large vision-language models and generative modeling techniques.
+
+
+
+% => Data Engineer
+% I have the equivalent of 2 years of full-time experience as an ML Engineer, collaborating closely with data scientists to deploy ML models using PyTorch and Scikit-learn in production environments with Docker in CI/CD pipelines. I have experience with Spark to process large-scale data streams for robust distributed systems. Although I have little experience with Kubernetes, I have experience with its counterpart, Docker Compose, and I am eager to adapt to this new technology.
+% => Consultancy
+% My journey in data analytics and machine learning started 4 years ago, working on projects related to the environment and robotics. My current specialization involves developing efficient algorithms for continuously evolving data, which is highly valuable in contexts where data changes rapidly. My extensive technical background and experience in deploying scalable machine learning models equip me to contribute effectively to many data science initiatives.
+\end{cvparagraph}
+
+%==== WORK EXPERIENCE
+\cvsection{Work Experience}
+
+% From Jackquelin: Add to working experience: mention more related technologies in the Work experience description bullet.
+
+\begin{cventries}
+%---------------------------------------------------------
+  \cventry
+    {ABB} % Organization
+    {Data Science Intern} % Job title
+    {Västerås, Sweden} % Location
+    {6 months (Feb 2024 - Jul 2024), Full time} % Date(s)
+    {
+      \begin{cvitems} % Description(s) of tasks/responsibilities
+        % \item {Project: Design and Application of a Machine Learning Framework for Real World Systems in an Automation Environment.}
+        \item {Developed Online Learning model in Rust to handle robot streaming data. Trained model online improving accuracy of robotic arm by 55\%.}
+        \item {Improved scalability of model with Rust, achieving a speedup by 28x compared to its Python implementation in Scikit-learn/River.}
+      \end{cvitems}
+    }
+%---------------------------------------------------------
+  \cventry
+    {Fondazione Bruno Kessler (Research Center)} % Organization
+    % "Bruno Kessler Foundation" is not the english name
+    {Data Scientist} % Job title
+    {Trento, Italy} % Location
+    {3 years (Jan 2020 - Dec 2022), 14 h/week} % Date(s)
+    {
+      \begin{cvitems} % Description(s) of tasks/responsibilities
+        \item {Developed, trained, and tuned hyperparameters of \href{https://marcodifrancesco.com/assets/img/nowcasting-thesis/nowcasting-presentation.pdf}{weather forecasting models using computer vision models in PyTorch}. Created MLOps infrastructure for deploying the model using Docker. Deployed in production with Azure Functions using CI/CD.}
+        \item {Implemented model for cyst segmentation using a custom semi-3D dataset of MRI images. Implemented in PyTorch torchvision, and improved model's accuracy using pre-processing techniques. Paper: \href{https://www.nature.com/articles/s41598-024-52677-1}{[Monaco S. et al. (2024)]}.}
+        \item {Developed a Python dashboard to extract insights from air quality data with a focus on feature engineering and large dataset processing (10GB+). Deployed database on Azure SQL Database, and dashboard on a Linux virtual machine.}
+      \end{cvitems}
+    }
+%---------------------------------------------------------
+\end{cventries}
+
+
+%==== HONORS
+% \input{resume/honors.tex}
+
+
+%==== PRESENTATION
+% \input{resume/presentation.tex}
+
+
+%==== WRITING
+% \input{resume/writing.tex}
+
+
+%==== COMMITTEES
+% \input{resume/committees.tex}
+
+
+%==== EDUCATION
+\cvsection{Education}
+
+\begin{cventries}
+%---------------------------------------------------------
+  \cventry
+    {Aalto University + University of Twente} % Institution
+    {Master in Data Science} % Degree
+    {Finland + Netherlands} % Location
+    {2022 - 2024} % Date(s)
+    {
+      \begin{cvitems} % Description(s) bullet points
+        \item {Major in Data Science - Minor in Innovation \& Entrepreneurship. Graduated with Honous. GPA: 3.3 / 4.0 .}
+        \item {Specialization courses: Big Data and high-performance computing (HPC), Data Mining, Complex Networks, Natural Language Processing.}
+        \item {Awarded Dean’s Scholarship by Aalto University for good Academic Performance + Tuition waiver given to most promising students.}
+      \end{cvitems}
+    }
+%---------------------------------------------------------
+  \cventry
+    {University of Trento} % Institution
+    {Bachelor in Computer Science} % Degree
+    {Trento, Italy} % Location
+    {2018 - 2022} % Date(s)
+    {
+      \begin{cvitems} % Description(s) bullet points
+        \item {Specialization courses: Data Structures and Algorithms, Machine Learning, Calculus, and Software Engineering. Final grade: 95 / 110.}
+        \item {Final Project: “Comparative Analysis of Prediction Models for Short-Term Forecasting”}
+      \end{cvitems}
+    }
+%---------------------------------------------------------
+\end{cventries}
+
+
+%==== SKILLS
+% \cvsection{Relevant Skills}
+\cvsection{Relevant Technologies}
+
+\begin{cvskills}
+%---------------------------------------------------------
+  \cvskill
+    {Prog. Languages}
+    % Removed: Javascript, Bash, C++
+    {Python, Apache Spark (PySpark), SQL, Rust, Java,  C, R.}
+%---------------------------------------------------------
+  \cvskill
+    {ML Libraries}
+    % Removed: Matplotlib, Pandas
+    {PyTorch, Scikit-Learn, and Numpy (ML and DL in Python), River, LightRiver (Online Machine Learning).}
+%---------------------------------------------------------
+  \cvskill
+    {Technologies}
+    % Removed: Testing, Agile, Scrum, 
+        {Docker (Compose), Linux (Shell), CI/CD (Github Actions, Travis CI), SQL DB (Postgres, SQLite), NoSQL (MongoDB), Git, Nginx.}
+%---------------------------------------------------------
+  \cvskill
+    {Cloud}
+        {Azure (SQL, Functions, Blob Storage), GCP (Firestore, IAM), AWS (Sagemaker).}
+%---------------------------------------------------------
+  \cvskill
+    {Languages}
+    {English (C1), Italian (native), Spanish (B1).}
+%---------------------------------------------------------
+\end{cvskills}
+
+
+%==== RELEVANT PROJECTS
+\cvsection{Relevant Projects}
+
+\begin{cvprojects}
+%---------------------------------------------------------
+  \cvproject
+    {\href{https://marcodifrancesco.com/SmartElevator/}{Weather Forescasting}}
+    {Trained Image-based time series forecasting system to predict extreme precipitation to alert Italian civil protection.}
+    {}
+    {}
+%---------------------------------------------------------
+  \cvproject
+    {Cyst Segmentatin}
+    {Segmented polycystic kidney images using deep learning computer vision models. Paper: \href{https://www.nature.com/articles/s41598-024-52677-1}{[Monaco S. et al. (2024)]}.}
+    {}
+    {}
+%---------------------------------------------------------
+  \cvproject
+    {\href{https://marcodifrancesco.com/NYCTaxis/}{Big Data}}
+    {Analyzed taxi tipping behavior with Apache Spark and PySpark. Processed large-scale dataset of 67 GB.}
+    {}
+    {}
+%---------------------------------------------------------
+  % \cvproject
+  %   {\href{https://marcodifrancesco.com/SmartElevator/}{Fault prediction}}
+  %   {Implemented AI system to predict Faults of elevator engines, together with the startup ITG Technologie.}
+  %   {}
+  %   {}
+%---------------------------------------------------------
+  % \cvproject
+  %   {\href{https://marcodifrancesco.com/CalendarAnalyzer/}{Data Analysis}}
+  %   {Analyzed and extracted insights of 3 years of Google Calendar Events in the Python Streamlit Dashboard.}
+  %   {}
+  %   {}
+%---------------------------------------------------------
+  % \cvproject
+  %   {\href{https://marcodifrancesco.com/MT-SMAC/}{Hyperparameter Optimization}}
+  %   {Improved Python Hyperparameter Optimization model. Extended from single-target to multi-target.}
+  %   {}
+  %   {}
+%---------------------------------------------------------
+\end{cvprojects}
+
+
+
+
+%==== EXTRACURRICULAR
+% \input{resume/extracurricular.tex}
+
+\cvsection{Extracurricular Activity}
+
+\begin{cvhonors}
+%---------------------------------------------------------
+  \cvhonor
+    {\href{https://www.linkedin.com/in/marcodifran/details/volunteering-experiences/}{Student Ambassador}}
+    {Shared my experience with 40+ students to inspire them to become our Master School students.}
+    {}
+    {2024}
+%---------------------------------------------------------
+  \cvhonor
+    {Tutor • Business Challenge}
+    {Tutored 2 teams (13 students) in the EIT Business Challenge, bringing one team to the final against 15 other teams.}
+    {}
+    {2023}
+%---------------------------------------------------------
+  \cvhonor
+    {Hackaton Project Leader}
+    {Organized and led a 6-person team for the "Parklet" business project during the Hack the SDGs hackathon.}
+    {}
+    {2023}
+%---------------------------------------------------------
+  \cvhonor
+    {Tutor and Teacher}
+    {Coordinated 2-week Data Science Summer School for 18-year-old students. Held lecture on Dashboarding in Streamlit.}
+    {}
+    {2021-22}
+%---------------------------------------------------------
+\end{cvhonors}
+
+
+\end{document}

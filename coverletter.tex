@@ -1,0 +1,164 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+% Awesome CV LaTeX Template for Cover Letter
+%
+% This template has been downloaded from:
+% https://github.com/posquit0/Awesome-CV
+%
+% Authors:
+% Claud D. Park <posquit0.bj@gmail.com>
+% Lars Richter <mail@ayeks.de>
+%
+% Template license:
+% CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+%
+
+
+%-------------------------------------------------------------------------------
+% CONFIGURATIONS
+%-------------------------------------------------------------------------------
+% A4 paper size by default, use 'letterpaper' for US letter
+\documentclass[11pt, a4paper]{awesome-cv}
+
+% Configure page margins with geometry
+\geometry{left=1.4cm, top=.8cm, right=1.4cm, bottom=1.8cm, footskip=.5cm}
+
+% Specify the location of the included fonts
+\fontdir[fonts/]
+
+% Color for highlights
+% Awesome Colors: awesome-emerald, awesome-skyblue, awesome-red, awesome-pink, awesome-orange
+%                 awesome-nephritis, awesome-concrete, awesome-darknight
+\colorlet{awesome}{awesome-red}
+% Uncomment if you would like to specify your own color
+% \definecolor{awesome}{HTML}{CA63A8}
+
+% Colors for text
+% Uncomment if you would like to specify your own color
+% \definecolor{darktext}{HTML}{414141}
+% \definecolor{text}{HTML}{333333}
+% \definecolor{graytext}{HTML}{5D5D5D}
+% \definecolor{lighttext}{HTML}{999999}
+
+% Set false if you don't want to highlight section with awesome color
+\setbool{acvSectionColorHighlight}{true}
+
+% If you would like to change the social information separator from a pipe (|) to something else
+\renewcommand{\acvHeaderSocialSep}{\quad\textbar\quad}
+
+
+%-------------------------------------------------------------------------------
+%	PERSONAL INFORMATION
+%	Comment any of the lines below if they are not required
+%-------------------------------------------------------------------------------
+% Available options: circle|rectangle,edge/noedge,left/right
+\photo[circle,noedge,left]{./assets/Picture CV-2.jpg}
+\name{Marco}{Di Francesco}
+\position{Data Scientist{\enskip\cdotp\enskip}Machine Learning Engineer}
+\address{Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark}
+
+% === Link from Integrand
+% \email{Known by Integrand}
+% === Normal Links
+% \mobile{+39 3476692467}
+\mobile{\emoji{flag-denmark} +45 91839615}
+\email{marcodifran@gmail.com}
+% \github{marcodifrancesco}
+\linkedin{MarcoDiFran}
+\homepage{marcodifrancesco.com}
+% === Other Links
+% \gitlab{gitlab-id}
+% \stackoverflow{SO-id}{SO-name}
+% \twitter{@twit}
+% \skype{skype-id}
+% \reddit{reddit-id}
+% \medium{madium-id}
+% \googlescholar{googlescholar-id}{name-to-display}
+%% \firstname and \lastname will be used
+% \googlescholar{googlescholar-id}{}
+% \extrainfo{extra informations}
+
+% \quote{``Excited about the endless possibilities of what can be achieved through the power of data."}
+
+
+%-------------------------------------------------------------------------------
+%	LETTER INFORMATION
+%	All of the below lines must be filled out
+%-------------------------------------------------------------------------------
+% The company being applied to
+\recipient
+  % {Company Recruitment Team}
+  % {Pleo Technologies\\Njalsgade 76, 4.\\2300 Copenhagen S\\Denmark}
+
+% The date on the letter, default is the date of compilation
+\letterdate{\today}
+
+% The title of the letter
+% \lettertitle{Job Application for {Data Scientist}}
+
+% How the letter is opened
+% \letteropening{Dear Mr./Ms./Dr. LastName,}
+\letteropening{Dear recruitment team,}
+
+% How the letter is closed
+\letterclosing{Sincerely,}
+
+% Any enclosures with the letter
+% \letterenclosure[Attached]{Curriculum Vitae}
+
+
+%-------------------------------------------------------------------------------
+\begin{document}
+
+% Print the header with above personal informations
+% Give optional argument to change alignment(C: center, L: left, R: right)
+\makecvheader[R]
+
+% Print the footer with 3 arguments(<left>, <center>, <right>)
+% Leave any of these blank if they are not needed
+\makecvfooter
+  {\today}
+  {Marco Di Francesco~~~·~~~Cover Letter}
+  {}
+
+% Print the title with above letter informations
+\makelettertitle
+
+%-------------------------------------------------------------------------------
+%	LETTER CONTENT
+%-------------------------------------------------------------------------------
+\begin{cvletter}
+
+\lettersection{About Me}
+% My name is Marco and I'm applying for the job offer that I found on {Linkedin}. Here is a short introduction about myself. My journey in Data Science began 4 years ago when I initially focused on developing Computer Vision models in the fields of biomedicine and environment. In the last year, I have been specializing in High Performance Computing applications within the robotics environment at ABB. I've recently moved to Copenhagen since I fell in love with the city, and I'm currently looking for a job that fits my interests.
+
+My name is Marco and I’m applying for the job offer that I found on Linkedin. Here is a short introduction about myself. My journey in Data Science began 4 years ago when I initially focused on developing Computer Vision models in the fields of biomedicine and environment. In the last year, I have been specializing in High Performance Computing applications within the robotics environment at ABB. Outside work, I am an active participant in sports and social events. I love spending time with people both in my personal and professional life.
+
+
+\lettersection{Why {Meteo Swiss?}}
+% => Consultancy
+% I am attracted to {Knightec} because of its reputation {in the technology and digitalization sector}. I have always been interested in working in a consultancy company since it offers the opportunity to solve diverse and complex problems across various industries, enabling continuous learning. For this reason, the opportunity to work in the field which requires understanding stakeholder needs and developing accordingly data analytics and machine learning solutions to fit their needs particularly intrigues me.
+% => Company
+% I am attracted to Veo because of its automated football match analytics product, and I am genuinely curious about the ML models currently employed in it. After gaining experience in larger corporations, I am now interested in transitioning to a startup where I can work in an environment with faster adoption of new technologies and accelerated processes from research to deployment in production.
+
+MeteoSwiss is of interest to me due to its data-driven forecasting models, which I became familiar with during my research tenure at the Fondazione Bruno Kessler. Specifically, the models from your institution were frequently referenced by researchers, including Gabriele Frank, for their precision in predicting extreme weather events. I am also very interested to contribute to MeteoSwiss’s collaboration with international organizations such as ECMWF.
+
+
+
+\lettersection{Why Me?}
+% => Consultancy
+% My technical expertise in machine learning and advanced data analytics positions me well to contribute to the development of many data science projects. Over the past 4 years, I have worked on numerous projects, closely collaborating with clients and stakeholders. This extensive experience has granted me a high level of independence, enabling me to manage projects from inception to completion. In this regard, I have led teams in a data science summer school, a business challenge, and a hackathon. In terms of technical skills, during my tenure in FBK, I have been working for 3 years in research, selecting appropriate ML models, training, tuning, and deployments in the cloud. Therefore, I am confident that my knowledge would be valuable to companies seeking data science expertise.
+% => Company
+% I have multiple years of experience in the machine learning field, and I have a deep understanding of Machine Learning theory. In the past, I've worked on many projects relevant to this position. Most importantly, during my experience at ABB, I worked in \href{https://marcodifrancesco.com/#lightriver}{regression analysis on robotic data} in Python and Rust which requires a deep understanding of the machine learning models and theory, and recently I have been working with \href{https://marcodifrancesco.com/#nyctaxis}{distributed analytic data processing with Apache Spark and PySpark}. In the past, I also built in a 3-year project a Streamlit dashboard to analyze my time spending patterns, and in 2022, I also thought Plotly Dash in the FBK summer school. About my technical expertise, during my tenure in FBK, I have been working for 3 years in research, selecting appropriate ML models, training, tuning, and deployments in Azure VMs. Overall, I believe I could bring a lot of knowledge to the team.
+
+As mentioned in the CV description, I have 2 years of full-time experience as a Machine Learning Engineer, developing and training nowcasting models for weather forecasting. In particular, I have experience working with large data sets to build data-driven models using PyTorch and contributing to MLOps platforms with Docker and CI/CD pipelines. My responsibilities involved implementing these models in both on-premises and cloud environments like GCP and AWS. Additionally, I have extensive experience with high-performance computing (HPC), which I believe will be an asset in handling large-scale weather data archives. Thus, I’m pretty confident that given my experience in this task, I have all the skills required by this job.
+
+
+I have many projects to discuss on this topic and look forward to further discussing how my background and skills can align with this job opportunity. Thank you for considering my application.
+
+\end{cvletter}
+
+%-------------------------------------------------------------------------------
+\makeletterclosing
+
+\end{document}
