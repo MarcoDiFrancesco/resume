@@ -23,39 +23,36 @@ Good. Now change the \position to what you think it's the most suitable.
 ```
 
 
+```
+Consider the job description in the README.md, and the CV in resume.tex, and update coverletter.tex to match the requirements of this new job description of this new company. In each section pick up muliple points brought up from the job description.
+- Keep the cover letter extremely technical.
+- The changes have to be subtile, keep the description of the same idea and only slightly modify the phrases.
+- (TEMPORARY POINT): I don't have experience with: LangChain, DataBricks, MLFlow, FastAPI.
+```
+
+
 # Job description
 
-Data Engineer - SQL, Python (BBBH22288) Opfikon, Switzerland
-Data Engineer vacancy requiring profound SQL and Python knowledge for our Zurich based client in the pharmaceutical sector.
+# **Machine Learning Engineer NewTech - Advisory Challenger Academy 2025**
 
-Your tasks:
+*What if you could help companies transform their businesses using AI and machine learning? Joining KPMG as a Machine Learning Engineer means you’ll be working with a variety of clients, applying the latest AI models to optimize operations, enhance customer experiences, and predict future trends. Take on exciting challenges from day one and shape the future of businesses with machine learning.*
 
-Developing and maintaining backend processes focused on data engineering and SQL integration
-Implementing front-end components using HTML, CSS, and JavaScript, and creating interactive data visualizations with Plotly
-Scripting and automating data-related processes using Python and libraries such as scikit-learn, pandas, and numpy
-Developing APIs to facilitate data integration and accessibility
-Performing unit testing to ensure code quality, reliability, and functionality
-Collaborating with teams to integrate machine learning models into existing data architectures and workflows
+**KPMG Challenger Academy**
 
-Your experience/knowledge:
+Are you looking for a graduate programme? We think we have something better! At KPMG, you have the freedom to shape your own career. With endless opportunities to grow, learn, and take on new challenges, the KPMG Challenger Academy is where you build a future you are excited about. As part of the Academy, you set your own goals, work on interesting client projects, and get the best training to develop yourself. To make things even better, you get your own Koach (not Coach—we did spell-check this job ad, but KPMG’s equivalent of a performance manager) to help you reach your full potential and achieve your goals.
 
-Expertise in data engineering, coupled with proficiency in SQL for backend development
-Proficiency in front-end technologies including HTML, CSS, and basic JavaScript
-Strong knowledge of Python, with experience in scikit-learn, pandas, and numpy
-Ability to develop simple APIs for seamless data integration and accessibility
-Familiarity with agile methodologies and tools like Jira
-Experience with Databricks for processing and managing large datasets is preferred
+The Academy is designed for your early career after graduating your master studies. The Academy is split into 3 dynamic off-site modules, each designed to get you started in your new role and develop you as a consultant. Regardless of whether you are a recent graduate or bring previous experience, we ensure that everyone starts from the same point with equal opportunities to grow professionally.
 
-Your soft skills:
+Curious to know more about the KPMG Challenger Academy? You can read much more [here](https://kpmg.com/dk/en/home/careers/graduates1.html).
 
-Excellent comprehension skills with attention to detail
-Analytical and solution-orientated thinking
+**Do you recognize yourself in the following?**
 
+You have strong technical skills in building and deploying machine learning models, with a solid understanding of algorithms and data structures. Experience with Scikit-Learn, XGBoost, Hugging Face, LangChain, DataBricks, MLFlow, FastAPI or similar frameworks is key, and you excel at optimizing models for performance and scalability. You're familiar with cloud platforms, data pipelines, and version control using Git, allowing you to integrate models into production seamlessly. Above all, you’re passionate about AI’s transformative potential and enjoy designing, training, and optimizing models that make AI accessible for real-world applications.
 
-Location:             Zurich, Switzerland
-Work setting:       Hybrid
-Sector:                 Pharmaceutical
-Start:                    ASAP
-Duration:              06MM+
-Workload:            100%
-Ref.Nr.:                BH22288
+Examples of tasks that you will do:
+
+- Design, develop, and deploy machine learning models at scale.
+- Optimize model performance for real-world applications.
+- Integrate models into production environments using cloud platforms and Git.
+- Collaborate with cross-functional teams to implement AI solutions.
+- Stay up-to-date with emerging trends in machine learning and AI.
