@@ -25,8 +25,8 @@ Good. Now change the \position to what you think it's the most suitable.
 
 ```
 Consider the job description in the README.md, and the CV in resume.tex, and update coverletter.tex to match the requirements of this new job description of this new company. In each section pick up muliple points brought up from the job description.
+- IMPORTANT: The changes have to be subtile, keep the description of the same idea and only slightly modify the phrases.
 - Keep the cover letter extremely technical.
-- The changes have to be subtile, keep the description of the same idea and only slightly modify the phrases.
 - (TEMPORARY POINT): I don't have experience with: LangChain, DataBricks, MLFlow, FastAPI.
 ```
 
