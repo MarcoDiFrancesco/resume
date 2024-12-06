@@ -3,6 +3,7 @@
 ## CV
 
 ```
+(Prompt 1)
 Consider the job description in JOB_DESCRIPTION.md. Update resume.tex to match every point in bold italic (using ***); if it's not in bold italic don't mention it. Ensure the tone remains understated, factual, and free from buzzwords or formal corporate language. Avoid adjectives and superlative language like "strong", "leveraging," "seamless," and "high-quality," in favor of clear and neutral descriptions of skills and experience. Keep the tone modest and straightforward.
 
 Edit the following sections:
@@ -12,9 +13,9 @@ Edit the following sections:
 ```
 
 ```
+(Prompt 2)
 In section "Education":
 - Prioritize the courses most important. Do not add other courses.
-
 
 In section "Relevant Technologies":
 - Prioritize the technologies that they require.
@@ -24,6 +25,7 @@ In section "Relevant Technologies":
 ```
 
 ```
+(Prompt 3)
 In section "Relevant Projects" comment the projects which are irrelevant. Uncomment the ones are relevant.
 - Rank them by relevance for this job posting.
 - Keep exactly 3 projects.
@@ -34,6 +36,7 @@ Check if the preamble has a suitable title: e.g. Data Scientist, Machine Learnin
 ## Motivation letter
 
 ```
+(Prompt 4 - Cover letter)
 Consider the job description in JOB_DESCRIPTION.md, the CV in resume.tex, and update coverletter.tex to match the requirements of this new job description of this new company. In each section pick up muliple points brought up from the job description.
 - IMPORTANT: The changes have to be subtile, keep the description of the same idea and only slightly modify the sentences.
 - Keep the cover letter tone extremely technical.
