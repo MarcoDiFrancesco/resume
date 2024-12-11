@@ -36,7 +36,7 @@ Check if the preamble has a suitable title: e.g. Data Scientist, Machine Learnin
 ## Motivation letter
 
 ```
-(Prompt 4 - Cover letter)
+(Prompt: Cover letter)
 Consider the job description in JOB_DESCRIPTION.md, the CV in resume.tex, and update coverletter.tex to match the requirements of this new job description of this new company. In each section pick up muliple points brought up from the job description.
 - IMPORTANT: The changes have to be subtile, keep the description of the same idea and only slightly modify the sentences.
 - Keep the cover letter tone extremely technical.
@@ -45,4 +45,11 @@ Consider the job description in JOB_DESCRIPTION.md, the CV in resume.tex, and up
 
 ```
 Change the \position to what you think it's the most suitable - e.g. Data Scientist, Machine Learning Engineer, Data Engineer - or whatever fits the best.
+```
+
+## Email draft
+
+```
+(Prompt: Email Draft)
+Rewrite the EMAIL_DRAFT.md considering the JOB_DESCRIPTION.md to show I'm interested in the position. If there is no email provided in the job description refuse to answer. Ask 2 very relevant questions. Keep them without corporate jargon.
 ```
