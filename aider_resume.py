@@ -1,7 +1,13 @@
-from linkedin_import_utils import get_links_from_file
-from linkedin_import_selenium import Selenium
-from linkedin_import_notion import Notion
-from linkedin_import_llm import Llm
+from utils.utils import (
+    get_links_from_file,
+    check_files_existance,
+    check_git_changes,
+    has_job_description,
+)
+from utils.selenium import Selenium
+from utils.notion import Notion
+from utils.llm import Llm
+from utils.aider_refactor import Aider
 import os
 import pdb
 
@@ -57,6 +63,15 @@ def main():
         input(
             "Application Submitted? If so, press Enter to process next job posting..."
         )
+
+        # Initiate each time new LLM instance (why???)
+        aider_refactor = Aider()
+        check_git_changes("resume.tex")
+        check_git_changes("EMAIL_DRAFT.md")
+        print("✅ Resume and Email draft have no git changes")
+        has_job_description()
+        print("✅ Job description is not empty")
+        aider_refactor.run_prompts()
 
 
 main()
