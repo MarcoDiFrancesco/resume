@@ -51,5 +51,5 @@ Change the \position to what you think it's the most suitable - e.g. Data Scient
 
 ```
 (Prompt: Email Draft)
-Rewrite the EMAIL_DRAFT.md considering the JOB_DESCRIPTION.md to show I'm interested in the position. If there is no email provided in the job description refuse to answer. Ask 2 very relevant questions. Keep them without corporate jargon.
+Rewrite the EMAIL_DRAFT.md considering the JOB_DESCRIPTION.md to show I'm interested in the position. If there is no email provided in the job description refuse to answer. Ask 2 very relevant questions. Keep them without corporate jargon and keep the tone very technical.
 ```
