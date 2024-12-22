@@ -1,7 +1,8 @@
 from aider.coders import Coder
 from aider.models import Model
 from utils.utils import check_files_existance
-
+import sys
+import os
 
 PROMPT_1 = """
 To not ask me "Run shell command?"
@@ -39,6 +40,11 @@ Check if the preamble has a suitable title: e.g. Data Scientist, Machine Learnin
 Choose the address closer to the job location.
 """
 
+PROMPT_COVER_LETTER = """
+(Prompt: Cover Letter)
+Output from this prompt with "I HAVE TO BE IMPLEMENTED".
+"""
+
 PROMPT_EMAIL_TEMPLATE = """
 (Prompt: Email Draft)
 Consider the two cases depending if there is a recruiter email in JOB_DESCRIPTION.md:
@@ -54,12 +60,32 @@ class Aider:
         check_files_existance(fnames)
 
         model = Model("sonnet")
-        self.coder = Coder.create(main_model=model, fnames=fnames, auto_commits=False)
+        self.coder = Coder.create(
+            main_model=model, fnames=fnames, auto_commits=False
+        )
 
-    def run_prompts(self):
-        self.coder.run(PROMPT_1)
-        self.coder.run(PROMPT_2)
-        self.coder.run(PROMPT_3)
+    def run_silent(self, prompt):
+        """Executes `self.coder.run(prompt)` disabling output."""
+        original_stdout = sys.stdout
+        with open(os.devnull, "w") as devnull:
+            sys.stdout = devnull
+            self.coder.run(prompt)
+        sys.stdout = original_stdout
 
+    def update_resume(self):
+        print("  [1/3] Prompt 1: Work experience (~30 sec) running...")
+        self.run_silent(PROMPT_1)
+        print("  [2/3] Prompt 2: ... (~10 sec) running...")
+        self.run_silent(PROMPT_2)
+        print("  [3/3] Prompt 3: ... (~20 sec) running...")
+        self.run_silent(PROMPT_3)
+
+    def update_cover_letter(self):
+        print("  [1/1] Prompt 4: Cover Letter")
+        self.coder.add_rel_fname("coverletter.tex")
+        self.run_silent(PROMPT_COVER_LETTER)
+
+    def create_email(self):
+        print("  [1/1] Prompt 5: Email")
         self.coder.add_rel_fname("EMAIL_DRAFT.md")
-        self.coder.run(PROMPT_EMAIL_TEMPLATE)
+        self.run_silent(PROMPT_EMAIL_TEMPLATE)
