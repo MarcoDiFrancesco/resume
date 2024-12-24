@@ -3,3 +3,4 @@ aider-chat==0.69.0
 selenium==4.27.1
 selenium-stealth==1.0.6
 notion-client==2.3.0
+notion2md==2.9.0

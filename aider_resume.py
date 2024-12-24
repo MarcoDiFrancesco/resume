@@ -6,35 +6,32 @@ from utils.notion import Notion
 from utils.llm import Llm
 from utils.aider_refactor import Aider
 import os
-import pdb
+from utils.utils import browser_open_silent, check_files_existance, copy_text_to_file
 
 
 def main():
     notion = Notion(os.environ["NOTION_DB_ID"])
     llm = Llm()
 
-    # Import job posting from LinkedIn
-    # while notion_page := notion.next_posting():
     notion_page = notion.next_posting()
+    notion_url = notion_page["url"]
+    linkedin_url = notion_page["properties"]["URL"]["url"]
 
-    # Notion - Check if job positing was already in DB
-    print("    Notion - Checks for duplicates")
-    #   - Filter by title (without traling spaces) and link (without trailing /)
-    # query = notion.query()
-    # if len(query["results"]) > 0:
-    #     print("Job posting already in Notion DB")
-    print("    Notion - Checks finished")
+    # browser_open_silent(notion_url)
+    # browser_open_silent(linkedin_url)
 
-    input("  Underline notion page. When done press Enter...")
+    notion.check_duplicate_page(linkedin_url)
 
-    # Notion - Checking if posting contains: company, city
-    print("    Notion - Checking if posting contains: company, city")
-    # TODO: Implement
-    print("    Notion - Checks finished")
+    # DEBUG: desabled check
+    # input("[🖊] Underline notion page. When done press Enter...")
 
-    input(
-        "  Copy notion page to JOB_DESCRIPTION.md: company, city + job description? When done press Enter..."
-    )
+    notion.check_properties(notion_page)
+
+    notion_page_content = notion.get_page_content(notion_page)
+
+    check_files_existance(["JOB_DESCRIPTION.md"])
+    copy_text_to_file(notion_page_content, "JOB_DESCRIPTION.md")
+    print("[📂] Notion page content copied to JOB_DESCRIPTION.md")
 
     # LLM - Fetch requirements: German, Currenty univerity student, PhD, Cover Letter, Recruiter email
     print("    LLM: fetching requirements")
@@ -88,7 +85,10 @@ def main():
 
     aider_refactor.create_email()
     print()
-    print("============================= Job posting done =============================")
+    print(
+        "============================= Job posting done ============================="
+    )
     print()
+
 
 main()
