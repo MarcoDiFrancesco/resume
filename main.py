@@ -4,7 +4,7 @@ from utils.utils import (
 )
 from utils.notion import Notion
 from utils.llm import Llm
-from utils.aider_refactor import Aider
+from utils.aider import Aider
 import os
 from utils.utils import (
     browser_open_silent,
