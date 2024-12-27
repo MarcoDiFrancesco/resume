@@ -44,8 +44,14 @@ In section "Relevant Projects" comment the projects which are irrelevant. Uncomm
 - Keep exactly 3 projects.
 
 Check if the preamble has a suitable job title: e.g. Data Scientist, Machine Learning Engineer, or Data Engineer; otherwise change it.
+"""
 
-Choose the address closer to the job location.
+
+PROMPT_RESUME_ADDRESS = rf"""
+(Prompt Resume City - v4)
+
+Check if \address in resume.tex is the one specified in JOB_DESCRIPTION.md under 'My Address'.
+If not, update the address in resume.tex to be exactly the one specified in JOB_DESCRIPTION.md.
 """
 
 PROMPT_COVER_LETTER = """
@@ -99,6 +105,11 @@ class Aider:
         self.run_resume_prompt(INSTRUCTIONS + PROMPT_1, "Resume", 1, 3)
         self.run_resume_prompt(PROMPT_2, "Resume", 2, 3)
         self.run_resume_prompt(PROMPT_3, "Resume", 3, 3)
+
+    def update_resume_address(self):
+        self.run_resume_prompt(
+            INSTRUCTIONS + PROMPT_RESUME_ADDRESS, "Resume Address", 1, 1
+        )
 
     def update_cover_letter(self):
         # while True:

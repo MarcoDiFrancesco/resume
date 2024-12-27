@@ -4,6 +4,8 @@ import datetime
 from datetime import timedelta
 from notion2md.exporter.block import StringExporter
 from utils.utils import check_page_content
+from utils.utils import get_my_address
+
 
 class Notion:
     def __init__(self, db_id: str):
@@ -28,12 +30,12 @@ class Notion:
                 "property": "Stage",
                 "select": {"equals": "Not Applied"},
             },
-            sorts = [
+            sorts=[
                 {
                     "property": "Senior position",
                     "direction": "ascending",
                 }
-            ]
+            ],
         )
         if len(query) == 0:
             return None
@@ -78,29 +80,30 @@ class Notion:
             raise ValueError(f"[Notion] Check failed. Posting has duplicates: {url}")
         print(f"[Notion] Check successful. Posting has no duplicates.")
 
-    def _check_property_city(self, notion_page):
-        if not notion_page["properties"]["City"]["select"]:
-            print(f"[📑] Check failed. Property 'City' is empty.")
-            return False
-        return True
-
-    def _check_property_role(self, notion_page):
-        if not notion_page["properties"]["Role"]["select"]:
-            print(f"[📑] Check failed. Property 'Role' is empty.")
-            return False
-        return True
-
-    def _check_property_day(self, notion_page):
-        """Check if property '_Day' is non-empty and we are applying today."""
-        if not notion_page["properties"]["_Day"]["date"]:
-            print(f"[📑] Check failed. Property '_Day' is empty.")
-            return False
-        # If done before 6am consider previous day
-        today = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
-        if notion_page["properties"]["_Day"]["date"]["start"] != today:
-            print(f"[📑] Check failed. Property '_Day' is not today.")
-            return False
-        return True
+    def check_db_errors(self) -> None:
+        """Check if DB contains pages which are 'Applied' but contain no documents."""
+        print("[Notion] Checking DB errors...", end="\r")
+        query = self._query_db(
+            filter={
+                "and": [
+                    {
+                        "property": "Stage",
+                        "select": {"equals": "Applied"},
+                    },
+                    {
+                        "property": "Resume / Cover Letter",
+                        "files": {"is_empty": True},
+                    },
+                ]
+            },
+        )
+        # Check if there is more than one page
+        if len(query["results"]) != 0:
+            err_str = "[Notion] Check unsuccessful. These pages are maked as 'Applied' but have no uploaded document:\n"
+            for page in query["results"]:
+                err_str += f"  - {page['url']}\n"
+            raise ValueError(err_str)
+        print("[Notion] Check DB errors successful.")
 
     def check_properties(self, notion_page) -> None:
         """
@@ -110,6 +113,31 @@ class Notion:
         - Day: if day is today
         - (Company: not checked company since ['Company']['relation'] is always empty.)
         """
+
+        def _check_property_city(notion_page):
+            if not notion_page["properties"]["City"]["select"]:
+                print(f"[📑] Check failed. Property 'City' is empty.")
+                return False
+            return True
+
+        def _check_property_role(notion_page):
+            if not notion_page["properties"]["Role"]["select"]:
+                print(f"[📑] Check failed. Property 'Role' is empty.")
+                return False
+            return True
+
+        def _check_property_day(notion_page):
+            """Check if property '_Day' is non-empty and we are applying today."""
+            if not notion_page["properties"]["_Day"]["date"]:
+                print(f"[📑] Check failed. Property '_Day' is empty.")
+                return False
+            # If done before 6am consider previous day
+            today = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
+            if notion_page["properties"]["_Day"]["date"]["start"] != today:
+                print(f"[📑] Check failed. Property '_Day' is not today.")
+                return False
+            return True
+
         url = notion_page["properties"]["URL"]["url"]
         while True:
             query = self._query_db(
@@ -122,9 +150,9 @@ class Notion:
             notion_page = query["results"][0]
             if all(
                 [
-                    self._check_property_city(notion_page),
-                    self._check_property_role(notion_page),
-                    self._check_property_day(notion_page),
+                    _check_property_city(notion_page),
+                    _check_property_role(notion_page),
+                    _check_property_day(notion_page),
                 ]
             ):
                 break
@@ -150,6 +178,8 @@ class Notion:
         res += f"Title: {title}\n"
         city = notion_page["properties"]["City"]["select"]["name"]
         res += f"City: {city}\n"
+        my_address = get_my_address(notion_page)
+        res += f"My Address: {my_address}\n"
         res += "===\n"
         res += "# Job Description\n"
         res += StringExporter(block_id=notion_page["id"]).export()
@@ -161,3 +191,11 @@ class Notion:
             res = self.get_page_content(notion_page)
 
         return res
+
+    def set_to_applied(self, notion_page) -> None:
+        print("[Notion] Setting page to 'Applied'...", end="\r")
+        self.notion.pages.update(
+            page_id=notion_page["id"],
+            properties={"Stage": {"select": {"name": "Applied"}}},
+        )
+        print("[Notion] Page set to 'Applied'.")

@@ -64,10 +64,37 @@ def browser_open_silent(link):
     print(f"[🌐] Opened in browser: {link}")
 
 
-def print_page_summary(notion_page, requir):
+def get_my_address(notion_page) -> str:
+    """
+    Get address from city. Addresses are hard-coded.
+
+    Example:
+    >>> _get_address(notion_page)
+    'Maneggstrasse 41, 8041 Zürich, Switzerland'
+    """
+    city = notion_page["properties"]["City"]["select"]["name"]
+    addresses = {
+        # Main cities
+        "Copenhagen": "Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark",
+        "Zurich": "Maneggstrasse 41, 8041 Zürich, Switzerland",
+        # Switzerland
+        "Basel": "Dornacherstrasse 192, 4053 Basel, Switzerland",
+        "Bern": "Rathausgasse 75, 3011 Bern, Switzerland",
+        "Geneva": "Rue Rothschild 28, 1202 Genève, Switzerland",
+        "Lausanne": "Rue Marterey 15, 1005 Lausanne, Switzerland",
+        "Lucerne": "Zürichstrasse 33, 6004 Luzern, Switzerland",
+        "Lugano": "Via Silvio Calloni 2, 6900 Lugano, Switzerland",
+        # Germany
+        "Munich": "Senefelderstraße 1, 80336 München, Germany",
+    }
+    assert city in addresses, f"City '{city}' not found in addresses."
+    return addresses[city]
+
+
+def print_page_summary(notion_page, requirements):
     title = "".join(notion_page["properties"]["Position"]["title"][0]["plain_text"])
     city = notion_page["properties"]["City"]["select"]["name"]
-    my_address = "Maneggstrasse 41, 8041 Zürich, Switzerland"
+    my_address = get_my_address(notion_page)
     time_delta = datetime.datetime.now() - dateutil.parser.parse(
         notion_page["created_time"], ignoretz=True
     )
@@ -83,12 +110,12 @@ def print_page_summary(notion_page, requir):
 === Job posting details ===
     Title: {title}
     Page created: {time_delta_str}
-    Location: {city}
-    My address: {my_address}
+    City: {city}
+    My Address: {my_address}
     
-    {requir.req_lang}
-    {requir.req_stud}
-    {requir.req_phd}
+    {requirements['req_lang']}
+    {requirements['req_stud']}
+    {requirements['req_phd']}
 ===========================
 """
     )

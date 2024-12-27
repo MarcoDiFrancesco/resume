@@ -19,6 +19,8 @@ def main():
     llm = Llm()
     aider_resume = Aider()
 
+    notion.check_db_errors()
+
     notion_page = notion.next_posting()
     notion_url = notion_page["url"]
     linkedin_url = notion_page["properties"]["URL"]["url"]
@@ -35,16 +37,19 @@ def main():
     check_files_existance(["JOB_DESCRIPTION.md"])
     copy_text_to_file(page_content, "JOB_DESCRIPTION.md")
 
-    requir = llm.fetch_requirements(page_content)
-    print_page_summary(notion_page, requir)
+    requirements = llm.fetch_requirements(page_content)
+    print_page_summary(notion_page, requirements)
 
     reset_git_changes("resume.tex")
     reset_git_changes("coverletter.tex")
     reset_git_changes("EMAIL_DRAFT.md")
 
     aider_resume.update_resume()
+    aider_resume.update_resume_address()
     aider_resume.update_cover_letter()
     aider_resume.create_email()
+
+    notion.set_to_applied(notion_page)
 
 
 main()
