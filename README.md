@@ -1,6 +1,7 @@
 Commands:
 
-Step 1: `python linkdin-import.py`
+**Python version: 3.12**
 
-Step 2: `python resume-refactor.py`
-
+```bash
+python main.py
+```

@@ -3,22 +3,28 @@ from aider.models import Model
 from utils.utils import check_files_existance
 import sys
 import os
+import time
+
+INSTRUCTIONS = """
+Do not ask me "Run shell command?", or any other command.
+"""
 
 PROMPT_1 = """
-To not ask me "Run shell command?"
+(Prompt Resume 1 - v4)
 
-(Prompt 1)
-Consider the job description in JOB_DESCRIPTION.md. Update resume.tex to match every point in bold italic (using ***); if it's not in bold italic don't mention it. Ensure the tone remains understated, factual, and free from buzzwords or formal corporate language. Avoid adjectives and superlative language like "strong", "leveraging," "seamless," and "high-quality," in favor of clear and neutral descriptions of skills and experience. Keep the tone modest and straightforward.
+Consider the job description in JOB_DESCRIPTION.md. Update resume.tex to match every point in bold italic (using ***); if it's not in bold italic don't mention it. 
+- Tone: Ensure the tone remains modest, factual, and free from buzzwords and corporate jargon. Avoid adjectives and superlative language like "strong", "leveraging," "seamless," and "high-quality," in favor of clear and neutral descriptions of skills and experience.
 
 Edit the following sections:
 
-- Section "SUMMARY": Pick the best summary that fits the role (e.g., ML Engineer, Data Scientist), uncomment it, and update it with every point which is in bold italic. The length of the summary should be around 100 words.
-- Section "Work Experience": update the positions at "ABB" and "Fondazione Bruno Kessler" by changing their description. The changes have to be subtile, keep the work experience description of the same idea and only slightly modify the sentences to underline the technologies. Keep the numbers mentioned.
+- "Summary": Pick the best summary that fits the role (e.g., ML Engineer, Data Scientist), uncomment it, and update it with every point which is in bold italic. The length of the summary should be around 100 words.
+- "Work Experience": update the positions at "ABB" and "Fondazione Bruno Kessler" by changing their description. The changes have to be subtile, keep the work experience description of the same idea and only slightly modify the sentences to underline the technologies. Keep the numbers mentioned.
 """
 
 
 PROMPT_2 = """
-(Prompt 2)
+(Prompt Resume 2 - v4)
+
 In section "Education":
 - Reorder the courses from most important to the least important. Do not change or add courses.
 
@@ -31,40 +37,50 @@ In section "Relevant Technologies":
 
 
 PROMPT_3 = """
-(Prompt 3)
+(Prompt Resume 3 - v4)
+
 In section "Relevant Projects" comment the projects which are irrelevant. Uncomment the ones are relevant.
 - Rank them by relevance for this job posting.
 - Keep exactly 3 projects.
 
-Check if the preamble has a suitable title: e.g. Data Scientist, Machine Learning Engineer, or Data Engineer; otherwise change it.
+Check if the preamble has a suitable job title: e.g. Data Scientist, Machine Learning Engineer, or Data Engineer; otherwise change it.
+
 Choose the address closer to the job location.
 """
 
 PROMPT_COVER_LETTER = """
-(Prompt: Cover Letter)
-Output from this prompt with "I HAVE TO BE IMPLEMENTED".
+(Prompt Cover Letter - v4)
+
+Consider the job description in JOB_DESCRIPTION.md, the CV in resume.tex, and update coverletter.tex to match the requirements of this new job description of this new company. In each section pick up muliple points brought up from the job description.
+- IMPORTANT: The changes have to be subtile, keep the description of the same idea and only slightly modify the sentences.
+- Keep the cover letter tone technical. Do not write any corporate jargon. Do not write adjectives like "particularly interested" and instead write only "interested".
+
+Specific sectinons:
+- "Why Company" keep the reason that I want to change from a large corporation to a smaller company.
 """
 
 PROMPT_EMAIL_TEMPLATE = """
-(Prompt: Email Draft)
-Consider the two cases depending if there is a recruiter email in JOB_DESCRIPTION.md:
-- If there is an email: rewrite the EMAIL_DRAFT.md to fit the JOB_DESCRIPTION.md. Do not write my experience, only make the questions.
-- If there is no email: refuse to answer with only "❌ No email provided in the job description.".
+(Prompt Email Draft - v4)
+
+Rewrite the EMAIL_DRAFT.md to fit the JOB_DESCRIPTION.md. Rewrite the 2 questions to fit the job description. 
+- Keep them without corporate jargon and keep the tone very technical.
+- Do not write my experience, only make the questions.
 """
 
 
 class Aider:
     def __init__(self):
         fnames = ["resume.tex", "JOB_DESCRIPTION.md"]
-        # Check if fnames files exists
         check_files_existance(fnames)
 
         model = Model("sonnet")
-        self.coder = Coder.create(
-            main_model=model, fnames=fnames, auto_commits=False
-        )
+        self.coder = Coder.create(main_model=model, fnames=fnames, auto_commits=False)
 
-    def run_silent(self, prompt):
+    def _run_prompt(self, prompt):
+        """Executes `self.coder.run(prompt)`."""
+        self.coder.run(prompt)
+
+    def _run_prompt_silent(self, prompt):
         """Executes `self.coder.run(prompt)` disabling output."""
         original_stdout = sys.stdout
         with open(os.devnull, "w") as devnull:
@@ -72,20 +88,38 @@ class Aider:
             self.coder.run(prompt)
         sys.stdout = original_stdout
 
+    def run_resume_prompt(self, prompt, file, num, tot):
+        print(f"[Aider] - {file} prompt {num}/{tot}. Running...", end="\r")
+        start = time.time()
+        self._run_prompt_silent(prompt)
+        end = time.time()
+        print(f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec.")
+
     def update_resume(self):
-        print("  [1/3] Prompt 1: Work experience (~30 sec) running...")
-        self.run_silent(PROMPT_1)
-        print("  [2/3] Prompt 2: ... (~10 sec) running...")
-        self.run_silent(PROMPT_2)
-        print("  [3/3] Prompt 3: ... (~20 sec) running...")
-        self.run_silent(PROMPT_3)
+        self.run_resume_prompt(INSTRUCTIONS + PROMPT_1, "Resume", 1, 3)
+        self.run_resume_prompt(PROMPT_2, "Resume", 2, 3)
+        self.run_resume_prompt(PROMPT_3, "Resume", 3, 3)
 
     def update_cover_letter(self):
-        print("  [1/1] Prompt 4: Cover Letter")
+        # while True:
+        #     inpt = input(
+        #         "[Aider] Cover Letter required ✅. Do you want to update it? [y/n]: "
+        #     )
+        #     if inpt == "y":
+        #         break
+        #     elif inpt == "n":
+        #         return
+
         self.coder.add_rel_fname("coverletter.tex")
-        self.run_silent(PROMPT_COVER_LETTER)
+        self.run_resume_prompt(INSTRUCTIONS + PROMPT_COVER_LETTER, "Cover Letter", 1, 1)
 
     def create_email(self):
-        print("  [1/1] Prompt 5: Email")
+        # while True:
+        #     inpt = input("[Aider] Email provided ✅. Do you want to update it? [y/n]: ")
+        #     if inpt == "y":
+        #         break
+        #     elif inpt == "n":
+        #         return
+
         self.coder.add_rel_fname("EMAIL_DRAFT.md")
-        self.run_silent(PROMPT_EMAIL_TEMPLATE)
+        self.run_resume_prompt(INSTRUCTIONS + PROMPT_EMAIL_TEMPLATE, "Email", 1, 1)

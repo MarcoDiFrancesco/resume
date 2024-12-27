@@ -1,8 +1,9 @@
 from notion_client import Client
 import os
 import datetime
+from datetime import timedelta
 from notion2md.exporter.block import StringExporter
-
+from utils.utils import check_page_content
 
 class Notion:
     def __init__(self, db_id: str):
@@ -26,13 +27,18 @@ class Notion:
             filter={
                 "property": "Stage",
                 "select": {"equals": "Not Applied"},
-            }
+            },
+            sorts = [
+                {
+                    "property": "Senior position",
+                    "direction": "ascending",
+                }
+            ]
         )
         if len(query) == 0:
             return None
         next_posting = query["results"][0]
-        link = next_posting["url"]
-        print(f"[Notion] Fetched {len(query)} postings. Next: {link}")
+        print(f"[Notion] Fetched {len(query)} postings.  ")
         return next_posting
 
     def check_duplicate_page(self, url: str) -> None:
@@ -89,7 +95,8 @@ class Notion:
         if not notion_page["properties"]["_Day"]["date"]:
             print(f"[📑] Check failed. Property '_Day' is empty.")
             return False
-        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        # If done before 6am consider previous day
+        today = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
         if notion_page["properties"]["_Day"]["date"]["start"] != today:
             print(f"[📑] Check failed. Property '_Day' is not today.")
             return False
@@ -103,14 +110,26 @@ class Notion:
         - Day: if day is today
         - (Company: not checked company since ['Company']['relation'] is always empty.)
         """
-        while [
-            self._check_property_city(notion_page),
-            self._check_property_role(notion_page),
-            self._check_property_day(notion_page),
-        ] != [True, True, True]:
-            input(f"[📑] Update properties and press Enter...")
-            query = self._query_db(id=notion_page["id"])
+        url = notion_page["properties"]["URL"]["url"]
+        while True:
+            query = self._query_db(
+                filter={
+                    "property": "URL",
+                    "url": {"equals": url},
+                }
+            )
+            assert len(query["results"]) == 1, "Duplicate posting with same URL."
             notion_page = query["results"][0]
+            if all(
+                [
+                    self._check_property_city(notion_page),
+                    self._check_property_role(notion_page),
+                    self._check_property_day(notion_page),
+                ]
+            ):
+                break
+            input(f"[📑] Update properties and press Enter...")
+        return notion_page
 
     def get_page_content(self, notion_page) -> str:
         """Returns Notion page in markdown. Includes both properties and body.
@@ -134,4 +153,11 @@ class Notion:
         res += "===\n"
         res += "# Job Description\n"
         res += StringExporter(block_id=notion_page["id"]).export()
+
+        while not check_page_content(res):
+            input(
+                "[🖊] Underline check faliled. Underline text in italic-bold in Notion page. When done press Enter..."
+            )
+            res = self.get_page_content(notion_page)
+
         return res
