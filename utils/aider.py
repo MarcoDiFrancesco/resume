@@ -99,7 +99,7 @@ class Aider:
         start = time.time()
         self._run_prompt_silent(prompt)
         end = time.time()
-        print(f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec.")
+        print(f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec. Session cost: {self.coder.total_cost:.2f}$")
 
     def update_resume(self):
         self.run_resume_prompt(INSTRUCTIONS + PROMPT_1, "Resume", 1, 3)

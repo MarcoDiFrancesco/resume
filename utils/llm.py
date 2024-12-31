@@ -31,8 +31,6 @@ class Llm:
         )
         resp = response.choices[0].message.content
         return resp
-        # resp_list = resp.split("\n")
-        # return resp_list
 
     def _query_json(
         self, model: str, instructions: str, prompt: str, prop_name: str, prop_desc: str
@@ -106,5 +104,5 @@ class Llm:
                 page_content,
             )
             reqs_output[requir_name] = res
-        print("[LLM] Requirements fetched           ")
+        print("[LLM | 3/3] Requirements fetched           ")
         return reqs_output
