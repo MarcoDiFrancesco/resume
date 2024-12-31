@@ -84,22 +84,26 @@ def get_my_address(notion_page) -> str:
         "Lausanne": "Rue Marterey 15, 1005 Lausanne, Switzerland",
         "Lucerne": "Zürichstrasse 33, 6004 Luzern, Switzerland",
         "Lugano": "Via Silvio Calloni 2, 6900 Lugano, Switzerland",
+        "St Gallen": "Zürcherstrasse 28, 9000 St. Gallen, Switzerland",
         # Germany
         "Munich": "Senefelderstraße 1, 80336 München, Germany",
+        "Hamburg": "Steintorpl. 3, 20099 Hamburg, Germany",
     }
     assert city in addresses, f"City '{city}' not found in addresses."
     return addresses[city]
 
 
-def print_page_summary(notion_page, requirements):
+def print_page_summary(notion_page):
     title = "".join(notion_page["properties"]["Position"]["title"][0]["plain_text"])
     city = notion_page["properties"]["City"]["select"]["name"]
     my_address = get_my_address(notion_page)
     time_delta = datetime.datetime.now() - dateutil.parser.parse(
         notion_page["created_time"], ignoretz=True
     )
-    if time_delta.days > 0:
+    if time_delta.days >= 2:
         time_delta_str = f"{time_delta.days} days ago"
+    if time_delta.days >= 1:
+        time_delta_str = f"{time_delta.days} day ago"
     elif time_delta.seconds > 60 * 60:
         time_delta_str = f"{time_delta.seconds // (60*60)} hours ago"
     else:
@@ -112,10 +116,16 @@ def print_page_summary(notion_page, requirements):
     Page created: {time_delta_str}
     City: {city}
     My Address: {my_address}
-    
+"""
+    )
+
+
+def print_page_requirements(requirements):
+    print(
+        f"""
+=== Posting requirements ===
     {requirements['req_lang']}
     {requirements['req_stud']}
     {requirements['req_phd']}
-===========================
 """
     )

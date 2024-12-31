@@ -11,6 +11,7 @@ from utils.utils import (
     check_files_existance,
     copy_text_to_file,
     print_page_summary,
+    print_page_requirements,
 )
 
 
@@ -19,26 +20,26 @@ def main():
     llm = Llm()
     aider_resume = Aider()
 
-    notion.check_db_errors()
-
+    notion.check_db_missing_files()
     notion_page = notion.next_posting()
+    page_descr = notion.get_page_descr(notion_page)
+    requirements = llm.fetch_requirements(page_descr)
+    print_page_requirements(requirements)
+
     notion_url = notion_page["url"]
     linkedin_url = notion_page["properties"]["URL"]["url"]
-
+    notion.check_duplicate_page(linkedin_url)
     browser_open_silent(notion_url)
     browser_open_silent(linkedin_url)
 
-    notion.check_duplicate_page(linkedin_url)
-
     input("[🖊] Underline text in italic-bold in Notion page. When done press Enter...")
-    notion_page = notion.check_properties(notion_page)
-    page_content = notion.get_page_content(notion_page)
+    notion_page = notion.check_page_properties(notion_page)
+    page_full_content = notion.get_page_full_content(notion_page)
 
     check_files_existance(["JOB_DESCRIPTION.md"])
-    copy_text_to_file(page_content, "JOB_DESCRIPTION.md")
+    copy_text_to_file(page_full_content, "JOB_DESCRIPTION.md")
 
-    requirements = llm.fetch_requirements(page_content)
-    print_page_summary(notion_page, requirements)
+    print_page_summary(notion_page)
 
     reset_git_changes("resume.tex")
     reset_git_changes("coverletter.tex")

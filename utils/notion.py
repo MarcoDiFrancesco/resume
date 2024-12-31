@@ -23,7 +23,9 @@ class Notion:
         return query
 
     def next_posting(self):
-        """Fetch all postings 'Not Applied' and return the first one."""
+        """Fetch all postings 'Not Applied' and return the first one.
+        Return first all the non-senior positions.
+        """
         print("[Notion] Fetching postings...", end="\r")
         query = self._query_db(
             filter={
@@ -80,7 +82,7 @@ class Notion:
             raise ValueError(f"[Notion] Check failed. Posting has duplicates: {url}")
         print(f"[Notion] Check successful. Posting has no duplicates.")
 
-    def check_db_errors(self) -> None:
+    def check_db_missing_files(self) -> None:
         """Check if DB contains pages which are 'Applied' but contain no documents."""
         print("[Notion] Checking DB errors...", end="\r")
         query = self._query_db(
@@ -105,7 +107,7 @@ class Notion:
             raise ValueError(err_str)
         print("[Notion] Check DB errors successful.")
 
-    def check_properties(self, notion_page) -> None:
+    def check_page_properties(self, notion_page) -> None:
         """
         Check the following properties:
         - City: if label is non-empty
@@ -159,7 +161,11 @@ class Notion:
             input(f"[📑] Update properties and press Enter...")
         return notion_page
 
-    def get_page_content(self, notion_page) -> str:
+    def get_page_descr(self, notion_page):
+        return StringExporter(block_id=notion_page["id"]).export()
+
+
+    def get_page_full_content(self, notion_page) -> str:
         """Returns Notion page in markdown. Includes both properties and body.
 
         Example:
@@ -182,13 +188,13 @@ class Notion:
         res += f"My Address: {my_address}\n"
         res += "===\n"
         res += "# Job Description\n"
-        res += StringExporter(block_id=notion_page["id"]).export()
+        res += self.get_page_descr(notion_page)
 
         while not check_page_content(res):
             input(
                 "[🖊] Underline check faliled. Underline text in italic-bold in Notion page. When done press Enter..."
             )
-            res = self.get_page_content(notion_page)
+            res = self.get_page_full_content(notion_page)
 
         return res
 
@@ -198,4 +204,4 @@ class Notion:
             page_id=notion_page["id"],
             properties={"Stage": {"select": {"name": "Applied"}}},
         )
-        print("[Notion] Page set to 'Applied'.")
+        print("[Notion] Page set to 'Applied'.      ")

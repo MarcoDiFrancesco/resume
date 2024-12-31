@@ -8,7 +8,13 @@ class Llm:
         self.client = OpenAI()
 
     def _query(self, model: str, instructions: str, prompt: str) -> list:
-        """Simple LLM query."""
+        """Simple LLM query.
+                
+        Prompt caching:
+            Enabled automatically at 1024 tokens. Average job posting is 300-800.
+            Get cached tokens with:
+            `response.usage.prompt_tokens_details.cached_tokens`
+        """
         response = self.client.chat.completions.create(
             model=model,
             temperature=0,
@@ -17,17 +23,26 @@ class Llm:
                     "role": "system",
                     "content": instructions,
                 },
-                {"role": "user", "content": prompt},
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
             ],
         )
         resp = response.choices[0].message.content
-        resp_list = resp.split("\n")
-        return resp_list
+        return resp
+        # resp_list = resp.split("\n")
+        # return resp_list
 
     def _query_json(
         self, model: str, instructions: str, prompt: str, prop_name: str, prop_desc: str
     ) -> dict:
-        """LLM query with output in strict json format."""
+        """LLM query with output in strict json format.
+        
+        Response format:
+            Using response_format as json instead of pydantic class since it was not
+            possible to specify the description for each property.
+        """
         response_format = {
             "type": "json_schema",
             "json_schema": {
@@ -61,13 +76,8 @@ class Llm:
         return json.loads(response.choices[0].message.content)
 
     def fetch_requirements(self, page_content: str):
-        print("[LLM]: Fetching requirements...", end="\r")
-        instructions = "Fetch the requirements from the job posting."
+        print("[LLM | 0/3] Fetching requirements...", end="\r")
         """
-        Response format:
-            Using response_format as json instead of pydantic class since it's not
-            possible to specify the description for each property.
-
         Mono-query vs Multi-query:
             Mono-query used since Multi-query with 4o, temperature 0, fails to
             understand the requirement univeristy. E.g. marks the following
@@ -83,20 +93,18 @@ class Llm:
         """
         reqs = {
             "req_lang": "Check if one or more non-English languages are strictly required for this job. If so: '❌ Language required: <LANGUAGE>'. Otherwise: '➡️ Language requirement passed'",
-            "req_stud": "Check if the status of 'current a university student' is strictly required. If so: '❌ Current university student status required'. Otherwise: '➡️ Current university student status requirement passed'",
+            "req_stud": "Check if this posting is looking for currently enrolled university. If so: '❌ Current university student status required'. Otherwise: '➡️ Current university student status requirement passed'",
             "req_phd": "Check if a PhD degree is strictly required. If so: '❌ PhD position required'. Otherwise: '➡️ PhD requirement passed'",
         }
         reqs_output = {}
 
-        for requir_name, requir_desc in reqs.items():
-            res = self._query_json(
+        for idx, (requir_name, requir_desc) in enumerate(reqs.items()):
+            print(f"[LLM | {idx+1}/3]: Fetching requirements...", end="\r")
+            res = self._query(
                 "gpt-4o",
-                instructions,
-                page_content,
-                requir_name,
                 requir_desc,
+                page_content,
             )
-            reqs_output[requir_name] = res[requir_name]
-
-        print("[LLM]: Requirements fetched    ")
+            reqs_output[requir_name] = res
+        print("[LLM] Requirements fetched           ")
         return reqs_output
