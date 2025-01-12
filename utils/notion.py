@@ -14,7 +14,7 @@ class Notion:
 
     def _query_db(self, **kwargs):
         query = self.notion.databases.query(
-            database_id=self.db_id, page_size=10, **kwargs
+            database_id=self.db_id, page_size=25, **kwargs
         )
         return query
 
@@ -39,18 +39,18 @@ class Notion:
                 }
             ],
         )
-        if len(query) == 0:
+        if len(query["results"]) == 0:
             return None
         next_posting = query["results"][0]
-        print(f"[Notion] Fetched {len(query)} postings.  ")
+        print(f"[Notion] Fetched {len(query["results"])} postings.  ")
         return next_posting
 
     def check_duplicate_page(self, url: str) -> None:
         """
-        Check if there are other postings with the same URL in the database.
-        Test with and without trailing slash.
+        Check for other postings with the same URL with and without trailing slash.
+        If dupicate is found, raise ValueError.
 
-        Example:
+        Example of same URLs:
             - https://www.linkedin.com/jobs/view/1234567890
             - https://www.linkedin.com/jobs/view/1234567890/
         """
@@ -84,7 +84,7 @@ class Notion:
 
     def check_db_missing_files(self) -> None:
         """Check if DB contains pages which are 'Applied' but contain no documents."""
-        print("[Notion] Checking DB errors...", end="\r")
+        print("[Notion] Checking missing files in posts...", end="\r")
         query = self._query_db(
             filter={
                 "and": [
@@ -105,7 +105,7 @@ class Notion:
             for page in query["results"]:
                 err_str += f"  - {page['url']}\n"
             raise ValueError(err_str)
-        print("[Notion] Check DB errors successful.")
+        print("[Notion] Check missing files in posts successful.")
 
     def check_page_properties(self, notion_page) -> None:
         """
@@ -163,7 +163,6 @@ class Notion:
 
     def get_page_descr(self, notion_page):
         return StringExporter(block_id=notion_page["id"]).export()
-
 
     def get_page_full_content(self, notion_page) -> str:
         """Returns Notion page in markdown. Includes both properties and body.

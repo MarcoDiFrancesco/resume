@@ -99,38 +99,38 @@ class Aider:
         start = time.time()
         self._run_prompt_silent(prompt)
         end = time.time()
-        print(f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec. Session cost: {self.coder.total_cost:.2f}$")
-
-    def update_resume(self):
-        self.run_resume_prompt(INSTRUCTIONS + PROMPT_1, "Resume", 1, 3)
-        self.run_resume_prompt(PROMPT_2, "Resume", 2, 3)
-        self.run_resume_prompt(PROMPT_3, "Resume", 3, 3)
-
-    def update_resume_address(self):
-        self.run_resume_prompt(
-            INSTRUCTIONS + PROMPT_RESUME_ADDRESS, "Resume Address", 1, 1
+        print(
+            f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec. Session cost: {self.coder.total_cost:.2f}$"
         )
 
-    def update_cover_letter(self):
-        # while True:
-        #     inpt = input(
-        #         "[Aider] Cover Letter required ✅. Do you want to update it? [y/n]: "
-        #     )
-        #     if inpt == "y":
-        #         break
-        #     elif inpt == "n":
-        #         return
+    def update_resume(self):
+        self.run_resume_prompt(INSTRUCTIONS + PROMPT_1, "Resume", 1, 4)
+        self.run_resume_prompt(PROMPT_2, "Resume", 2, 4)
+        self.run_resume_prompt(PROMPT_3, "Resume", 3, 4)
+        self.run_resume_prompt(PROMPT_RESUME_ADDRESS, "Resume", 4, 4)
+
+    def update_cover_letter(self, requirements_files):
+        if not requirements_files["req_letter"]:
+            while True:
+                inpt = input(
+                    "[Aider] Cover Letter not required. Update it anyway? [y/n]: "
+                )
+                if inpt == "y":
+                    break
+                elif inpt == "n":
+                    return
 
         self.coder.add_rel_fname("coverletter.tex")
         self.run_resume_prompt(INSTRUCTIONS + PROMPT_COVER_LETTER, "Cover Letter", 1, 1)
 
-    def create_email(self):
-        # while True:
-        #     inpt = input("[Aider] Email provided ✅. Do you want to update it? [y/n]: ")
-        #     if inpt == "y":
-        #         break
-        #     elif inpt == "n":
-        #         return
+    def create_email(self, requirements_files):
+        if not requirements_files["req_email"]:
+            while True:
+                inpt = input("[Aider] Email not required. Update it anyway? [y/n]: ")
+                if inpt == "y":
+                    break
+                elif inpt == "n":
+                    return
 
         self.coder.add_rel_fname("EMAIL_DRAFT.md")
         self.run_resume_prompt(INSTRUCTIONS + PROMPT_EMAIL_TEMPLATE, "Email", 1, 1)

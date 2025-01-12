@@ -88,6 +88,11 @@ def get_my_address(notion_page) -> str:
         # Germany
         "Munich": "Senefelderstraße 1, 80336 München, Germany",
         "Hamburg": "Steintorpl. 3, 20099 Hamburg, Germany",
+        # Norway
+        "Oslo": "Bunks at Rode, Københavngata 10, 0566 Oslo, Norway",
+        # Austria
+        "Vienna": "Rechte Wienzeile 35, 1040 Wien, Austria",
+        
     }
     assert city in addresses, f"City '{city}' not found in addresses."
     return addresses[city]
@@ -116,6 +121,7 @@ def print_page_summary(notion_page):
     Page created: {time_delta_str}
     City: {city}
     My Address: {my_address}
+    Phone Number: +45 91839615
 """
     )
 

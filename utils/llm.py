@@ -9,7 +9,7 @@ class Llm:
 
     def _query(self, model: str, instructions: str, prompt: str) -> list:
         """Simple LLM query.
-                
+
         Prompt caching:
             Enabled automatically at 1024 tokens. Average job posting is 300-800.
             Get cached tokens with:
@@ -32,14 +32,14 @@ class Llm:
         resp = response.choices[0].message.content
         return resp
 
-    def _query_json(
-        self, model: str, instructions: str, prompt: str, prop_name: str, prop_desc: str
+    def _query_json_bool(
+        self, model: str, instructions: str, prompt: str, prop_name: str
     ) -> dict:
-        """LLM query with output in strict json format.
-        
+        """LLM query with output in strict json format. Used to output booleans.
+
         Response format:
-            Using response_format as json instead of pydantic class since it was not
-            possible to specify the description for each property.
+            Uses response_format as json instead of pydantic class since it would not
+            be possible to specify the description for each property.
         """
         response_format = {
             "type": "json_schema",
@@ -49,8 +49,8 @@ class Llm:
                     "type": "object",
                     "properties": {
                         prop_name: {
-                            "type": "string",
-                            "description": prop_desc,
+                            "type": "boolean",
+                            "description": instructions,
                         },
                     },
                     "required": [prop_name],
@@ -89,20 +89,37 @@ class Llm:
             instead of
                 "❌ Current university student status required"
         """
-        reqs = {
+        reqs_candidate = {
             "req_lang": "Check if one or more non-English languages are strictly required for this job. If so: '❌ Language required: <LANGUAGE>'. Otherwise: '➡️ Language requirement passed'",
             "req_stud": "Check if this posting is looking for currently enrolled university. If so: '❌ Current university student status required'. Otherwise: '➡️ Current university student status requirement passed'",
             "req_phd": "Check if a PhD degree is strictly required. If so: '❌ PhD position required'. Otherwise: '➡️ PhD requirement passed'",
         }
-        reqs_output = {}
+        reqs_candidate_out = {}
+        reqs_files = {
+            "req_letter": "Check if a cover letter or a motivation letter required. If so return True, otherwise False",
+            "req_email": "Check if an email of a recruiter is provided querstions regarding the job. If so return True, otherwise False",
+        }
+        reqs_files_out = {}
 
-        for idx, (requir_name, requir_desc) in enumerate(reqs.items()):
-            print(f"[LLM | {idx+1}/3]: Fetching requirements...", end="\r")
+        # Query string requirements
+        for idx, (requir_name, requir_desc) in enumerate(reqs_candidate.items()):
+            print(f"[LLM | {idx+1}/5]: Fetching requirements...", end="\r")
             res = self._query(
                 "gpt-4o",
                 requir_desc,
                 page_content,
             )
-            reqs_output[requir_name] = res
-        print("[LLM | 3/3] Requirements fetched           ")
-        return reqs_output
+            reqs_candidate_out[requir_name] = res
+        # Query boolean requirements
+        for idx, (requir_name, requir_desc) in enumerate(reqs_files.items()):
+            print(f"[LLM | {idx+4}/5]: Fetching requirements...", end="\r")
+            res = self._query_json_bool(
+                "gpt-4o",
+                requir_desc,
+                page_content,
+                requir_name,
+            )
+            reqs_files_out |= res
+
+        print("[LLM | 5/5] Requirements fetched           ")
+        return reqs_candidate_out, reqs_files_out

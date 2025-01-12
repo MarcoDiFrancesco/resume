@@ -22,9 +22,12 @@ def main():
 
     notion.check_db_missing_files()
     notion_page = notion.next_posting()
+    if not notion_page:
+        print("[✅] No new postings found. Add new postings to the Notion DB.")
+        return
     page_descr = notion.get_page_descr(notion_page)
-    requirements = llm.fetch_requirements(page_descr)
-    print_page_requirements(requirements)
+    requirements_candidate, requirements_files = llm.fetch_requirements(page_descr)
+    print_page_requirements(requirements_candidate)
 
     notion_url = notion_page["url"]
     linkedin_url = notion_page["properties"]["URL"]["url"]
@@ -46,11 +49,10 @@ def main():
     reset_git_changes("EMAIL_DRAFT.md")
 
     aider_resume.update_resume()
-    aider_resume.update_resume_address()
-    aider_resume.update_cover_letter()
-    aider_resume.create_email()
-
     notion.set_to_applied(notion_page)
+    aider_resume.update_cover_letter(requirements_files)
+    aider_resume.create_email(requirements_files)
+
 
 
 main()
