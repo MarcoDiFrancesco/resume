@@ -50,8 +50,8 @@ def main():
 
     aider.update_resume()
     notion.set_date_and_applied(notion_page)
-    aider.update_cover_letter(requirements["req_letter"])
-    aider.update_email(requirements["req_email"])
+    aider.update_cover_letter()
+    aider.update_email()
 
 
 main()

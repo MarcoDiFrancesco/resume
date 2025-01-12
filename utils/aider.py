@@ -105,28 +105,26 @@ class Aider:
         self._run_prompt(PROMPT_3, "Resume", 3, 4)
         self._run_prompt(PROMPT_RESUME_ADDRESS, "Resume", 4, 4)
 
-    def update_cover_letter(self, letter_requested):
-        if not letter_requested:
-            while True:
-                inpt = input(
-                    "[Aider] Cover Letter not requested. Update it anyway? [y/n]: "
-                )
-                if inpt == "y":
-                    break
-                elif inpt == "n":
-                    return
+    def update_cover_letter(self):
+        while True:
+            inpt = input(
+                "[Aider] Cover Letter not requested. Update it anyway? [y/n]: "
+            )
+            if inpt == "y":
+                break
+            elif inpt == "n":
+                return
 
         self.coder.add_rel_fname("coverletter.tex")
         self._run_prompt(INSTRUCTIONS + PROMPT_COVER_LETTER, "Cover Letter", 1, 1)
 
-    def update_email(self, email_provided):
-        if not email_provided:
-            while True:
-                inpt = input("[Aider] Email not provided. Update it anyway? [y/n]: ")
-                if inpt == "y":
-                    break
-                elif inpt == "n":
-                    return
+    def update_email(self):
+        while True:
+            inpt = input("[Aider] Email not provided. Update it anyway? [y/n]: ")
+            if inpt == "y":
+                break
+            elif inpt == "n":
+                return
 
         self.coder.add_rel_fname("EMAIL_DRAFT.md")
         self._run_prompt(INSTRUCTIONS + PROMPT_EMAIL_TEMPLATE, "Email", 1, 1)

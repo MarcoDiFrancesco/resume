@@ -129,25 +129,24 @@ def print_page_requirements(requirements):
     # Experience requirements
     print(
         f"""
-=== Experience requirements ===
-    {requirements['req_lang']}
-    {requirements['req_stud']}
-    {requirements['req_phd']}
+    ┌──────────────────────────────────────────────────────────────────────────
+    │ Experience requirements     
+    ├──────────┬───────────────────────────────────────────────────────────────
+    │ Language │ {requirements["req_lang"]}
+    │ Student  │ {requirements["req_stud"]}
+    │ PhD      │ {requirements["req_phd"]}
+    └──────────┴───────────────────────────────────────────────────────────────
 """
     )
 
     # Requirements files
-    rl = "✅" if requirements["req_letter"] else "➡"
-    re = "✅" if requirements["req_email"] else "➡"
     print(
-        """
-===   Files required     ===
-    ┌──────────────┬───────────────┐
-    │    Letter    │     Email     │
-    ├──────────────┼───────────────┤
-    │      {}      │       {}      │
-    └──────────────┴───────────────┘
-""".format(
-            rl, re
-        )
+        f"""
+    ┌──────────────────────────────────────────────────────────────────────────
+    │ Extra requirements     
+    ├─────────┬────────────────────────────────────────────────────────────────
+    │ Letter  │ {requirements["req_letter"]}
+    │ Email   │ {requirements["req_email"]}
+    └─────────┴────────────────────────────────────────────────────────────────
+"""
     )
