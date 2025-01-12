@@ -18,7 +18,7 @@ from utils.utils import (
 def main():
     notion = Notion(os.environ["NOTION_DB_ID"])
     llm = Llm()
-    aider_resume = Aider()
+    aider = Aider()
 
     notion.check_db_missing_files()
     notion_page = notion.next_posting()
@@ -26,8 +26,8 @@ def main():
         print("[✅] No new postings found. Add new postings to the Notion DB.")
         return
     page_descr = notion.get_page_descr(notion_page)
-    requirements_candidate, requirements_files = llm.fetch_requirements(page_descr)
-    print_page_requirements(requirements_candidate)
+    requirements = llm.fetch_requirements(page_descr)
+    print_page_requirements(requirements)
 
     notion_url = notion_page["url"]
     linkedin_url = notion_page["properties"]["URL"]["url"]
@@ -48,11 +48,10 @@ def main():
     reset_git_changes("coverletter.tex")
     reset_git_changes("EMAIL_DRAFT.md")
 
-    aider_resume.update_resume()
-    notion.set_to_applied(notion_page)
-    aider_resume.update_cover_letter(requirements_files)
-    aider_resume.create_email(requirements_files)
-
+    aider.update_resume()
+    notion.set_date_and_applied(notion_page)
+    aider.update_cover_letter(requirements["req_letter"])
+    aider.update_email(requirements["req_email"])
 
 
 main()

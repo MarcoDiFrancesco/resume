@@ -89,37 +89,37 @@ class Llm:
             instead of
                 "❌ Current university student status required"
         """
-        reqs_candidate = {
+        # String requirements
+        reqs_str = {
             "req_lang": "Check if one or more non-English languages are strictly required for this job. If so: '❌ Language required: <LANGUAGE>'. Otherwise: '➡️ Language requirement passed'",
             "req_stud": "Check if this posting is looking for currently enrolled university. If so: '❌ Current university student status required'. Otherwise: '➡️ Current university student status requirement passed'",
             "req_phd": "Check if a PhD degree is strictly required. If so: '❌ PhD position required'. Otherwise: '➡️ PhD requirement passed'",
         }
-        reqs_candidate_out = {}
-        reqs_files = {
+        # Boolean requirements
+        reqs_bool = {
             "req_letter": "Check if a cover letter or a motivation letter required. If so return True, otherwise False",
             "req_email": "Check if an email of a recruiter is provided querstions regarding the job. If so return True, otherwise False",
         }
-        reqs_files_out = {}
+        reqs_out = {}
 
         # Query string requirements
-        for idx, (requir_name, requir_desc) in enumerate(reqs_candidate.items()):
+        for idx, (req_name, req_desc) in enumerate(reqs_str.items()):
             print(f"[LLM | {idx+1}/5]: Fetching requirements...", end="\r")
             res = self._query(
                 "gpt-4o",
-                requir_desc,
+                req_desc,
                 page_content,
             )
-            reqs_candidate_out[requir_name] = res
+            reqs_out[req_name] = res
         # Query boolean requirements
-        for idx, (requir_name, requir_desc) in enumerate(reqs_files.items()):
+        for idx, (req_name, req_desc) in enumerate(reqs_bool.items()):
             print(f"[LLM | {idx+4}/5]: Fetching requirements...", end="\r")
             res = self._query_json_bool(
                 "gpt-4o",
-                requir_desc,
+                req_desc,
                 page_content,
-                requir_name,
+                req_name,
             )
-            reqs_files_out |= res
-
+            reqs_out[req_name] = res
         print("[LLM | 5/5] Requirements fetched           ")
-        return reqs_candidate_out, reqs_files_out
+        return reqs_out

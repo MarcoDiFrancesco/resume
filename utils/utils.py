@@ -92,7 +92,6 @@ def get_my_address(notion_page) -> str:
         "Oslo": "Bunks at Rode, Københavngata 10, 0566 Oslo, Norway",
         # Austria
         "Vienna": "Rechte Wienzeile 35, 1040 Wien, Austria",
-        
     }
     assert city in addresses, f"City '{city}' not found in addresses."
     return addresses[city]
@@ -127,11 +126,28 @@ def print_page_summary(notion_page):
 
 
 def print_page_requirements(requirements):
+    # Experience requirements
     print(
         f"""
-=== Posting requirements ===
+=== Experience requirements ===
     {requirements['req_lang']}
     {requirements['req_stud']}
     {requirements['req_phd']}
 """
+    )
+
+    # Requirements files
+    rl = "✅" if requirements["req_letter"] else "➡"
+    re = "✅" if requirements["req_email"] else "➡"
+    print(
+        """
+===   Files required     ===
+    ┌──────────────┬───────────────┐
+    │    Letter    │     Email     │
+    ├──────────────┼───────────────┤
+    │      {}      │       {}      │
+    └──────────────┴───────────────┘
+""".format(
+            rl, re
+        )
     )

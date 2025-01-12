@@ -112,8 +112,9 @@ class Notion:
         Check the following properties:
         - City: if label is non-empty
         - Role: if role is non-empty
-        - Day: if day is today
-        - (Company: not checked company since ['Company']['relation'] is always empty.)
+
+        Note for devs:
+        - Company: not checked company since ['Company']['relation'] is always empty.
         """
 
         def _check_property_city(notion_page):
@@ -125,18 +126,6 @@ class Notion:
         def _check_property_role(notion_page):
             if not notion_page["properties"]["Role"]["select"]:
                 print(f"[📑] Check failed. Property 'Role' is empty.")
-                return False
-            return True
-
-        def _check_property_day(notion_page):
-            """Check if property '_Day' is non-empty and we are applying today."""
-            if not notion_page["properties"]["_Day"]["date"]:
-                print(f"[📑] Check failed. Property '_Day' is empty.")
-                return False
-            # If done before 6am consider previous day
-            today = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
-            if notion_page["properties"]["_Day"]["date"]["start"] != today:
-                print(f"[📑] Check failed. Property '_Day' is not today.")
                 return False
             return True
 
@@ -154,7 +143,6 @@ class Notion:
                 [
                     _check_property_city(notion_page),
                     _check_property_role(notion_page),
-                    _check_property_day(notion_page),
                 ]
             ):
                 break
@@ -197,10 +185,15 @@ class Notion:
 
         return res
 
-    def set_to_applied(self, notion_page) -> None:
-        print("[Notion] Setting page to 'Applied'...", end="\r")
+    def set_date_and_applied(self, notion_page) -> None:
+        date = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
+        print(f"[Notion] Setting page to 'Applied' and date to '{date}'...", end="\r")
+        # If time is before 6am, consider the application date as the previous day
         self.notion.pages.update(
             page_id=notion_page["id"],
-            properties={"Stage": {"select": {"name": "Applied"}}},
+            properties={
+                "Stage": {"select": {"name": "Applied"}},
+                "_Day": {"date": {"start": date}},
+            },
         )
-        print("[Notion] Page set to 'Applied'.      ")
+        print(f"[Notion] Page set to 'Applied' and date to '{date}'.      ")
