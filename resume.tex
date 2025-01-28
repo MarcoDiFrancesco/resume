@@ -1,26 +1,10 @@
-%!TEX TS-program = lualatex
+% !TEX TS-program = lualatex
+% Original TS-program:
+% - xelatex (no support for emoji)
+% - lualatex (support for emoji)
 %!TEX encoding = UTF-8 Unicode
-% Awesome CV LaTeX Template for CV/Resume
-%
-% This template has been downloaded from:
-% https://github.com/posquit0/Awesome-CV
-%
-% Author:
-% Claud D. Park <posquit0.bj@gmail.com>
-% http://www.posquit0.com
-%
-% Template license:
-% CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
-%
 
-
-%-------------------------------------------------------------------------------
-% CONFIGURATIONS
-%-------------------------------------------------------------------------------
-% A4 paper size by default, use 'letterpaper' for US letter
 \documentclass[11pt, a4paper]{awesome-cv}
-
-% Configure page margins with geometry
 \geometry{left=1.4cm, top=.8cm, right=1.4cm, bottom=1.8cm, footskip=.5cm}
 
 % Package for hidden words
@@ -28,15 +12,11 @@
 % Command for hidden keywords
 \newcommand{\keywords}[1]{\vspace{-8pt}{\fontsize{1}{0}\selectfont \textcolor{white}{#1}}\vspace{-8pt}}
 
-% Specify the location of the included fonts
 \fontdir[fonts/]
-
 % Color for highlights
 % Awesome Colors: awesome-emerald, awesome-skyblue, awesome-red, awesome-pink, awesome-orange
 %                 awesome-nephritis, awesome-concrete, awesome-darknight
 \colorlet{awesome}{awesome-red}
-% Uncomment if you would like to specify your own color
-% \definecolor{awesome}{HTML}{CA63A8}
 
 % Colors for text
 % Uncomment if you would like to specify your own color
@@ -48,23 +28,16 @@
 % Set false if you don't want to highlight section with awesome color
 \setbool{acvSectionColorHighlight}{true}
 
-% If you would like to change the social information separator from a pipe (|) to something else
-\renewcommand{\acvHeaderSocialSep}{\quad\textbar\quad}
-
-
 %-------------------------------------------------------------------------------
 %	PERSONAL INFORMATION
-%	Comment any of the lines below if they are not required
 %-------------------------------------------------------------------------------
 % Available options: circle|rectangle,edge/noedge,left/right
-\photo[circle,noedge,left]{./assets/Picture CV-2.jpg}
+\photo[circle,noedge,left]{./assets/Picture CV-2-mini.jpg}
 \name{Marco}{Di Francesco}
 % \position{Data Scientist{\enskip\cdotp\enskip}Machine Learning Engineer}
-\position{Data Scientist}
-\address{Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark}
+\position{Machine Learning Engineer}
+\address{Via Silvio Calloni 2, 6900 Lugano, Switzerland}
 
-% === Link from Integrand
-% \email{Known by Integrand}
 % === Normal Links
 % \mobile{+39 3476692467}
 \mobile{\emoji{flag-denmark} +45 91839615}
@@ -121,10 +94,10 @@
 \begin{cventries}
 %---------------------------------------------------------
   \cventry
-    {ABB} % Organization
-    {Thesis Work} % Job title
-    {Västerås, Sweden} % Location
-    {6 months (Feb 2024 - Jul 2024), Full time} % Date(s)
+    {ABB}
+    {Thesis Work}
+    {Sweden, Västerås}
+    {6 months (Feb 2024 - Jul 2024), 100\%}
     {
       \begin{cvitems} % Description(s) of tasks/responsibilities
         % \item {Project: Design and Application of a Machine Learning Framework for Real World Systems in an Automation Environment.}
@@ -135,11 +108,11 @@
     }
 %---------------------------------------------------------
   \cventry
-    {Fondazione Bruno Kessler (Research Center)} % Organization
-    % "Bruno Kessler Foundation" is not the english name
-    {Data Scientist} % Job title
-    {Trento, Italy} % Location
-    {3 years (Jan 2020 - Dec 2022), 14 h/week} % Date(s)
+  % "Bruno Kessler Foundation" is not the english name
+    {Fondazione Bruno Kessler (Research Center)}
+    {Data Scientist}
+    {Italy, Trento}
+    {3 years (Jan 2020 - Dec 2022), 40\%}
     {
       \begin{cvitems} % Description(s) of tasks/responsibilities
         \item {Developed, trained, and optimized hyperparameters of \href{https://marcodifrancesco.com/assets/img/nowcasting-thesis/nowcasting-presentation.pdf}{weather forecasting models using computer vision models in PyTorch}. Established MLOps infrastructure for model deployment using Docker, and integrated into production with Azure Functions using CI/CD.}
@@ -151,22 +124,6 @@
 \end{cventries}
 
 
-%==== HONORS
-% \input{resume/honors.tex}
-
-
-%==== PRESENTATION
-% \input{resume/presentation.tex}
-
-
-%==== WRITING
-% \input{resume/writing.tex}
-
-
-%==== COMMITTEES
-% \input{resume/committees.tex}
-
-
 %==== EDUCATION
 \cvsection{Education}
 
@@ -175,7 +132,7 @@
   \cventry
     {Aalto University + University of Twente} % Institution
     {Master in Data Science} % Degree
-    {Finland + Netherlands} % Location
+    {Finland, Espoo + Netherlands, Enschede} % Location
     {2022 - 2024} % Date(s)
     {
       \begin{cvitems} % Description(s) bullet points
@@ -188,7 +145,7 @@
   \cventry
     {University of Trento} % Institution
     {Bachelor in Computer Science} % Degree
-    {Trento, Italy} % Location
+    {Italy, Trento} % Location
     {2018 - 2022} % Date(s)
     {
       \begin{cvitems} % Description(s) bullet points
@@ -201,7 +158,6 @@
 
 
 %==== SKILLS
-% \cvsection{Relevant Skills}
 \cvsection{Relevant Technologies}
 
 \begin{cvskills}
@@ -237,7 +193,6 @@
 
 %==== ADDITIONAL KEYWORDS
 \keywords{}
-
 
 
 %==== RELEVANT PROJECTS
@@ -294,8 +249,6 @@
   % {}
 %---------------------------------------------------------
 \end{cvprojects}
-
-
 
 
 %==== EXTRACURRICULAR
