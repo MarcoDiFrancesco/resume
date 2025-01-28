@@ -1,77 +1,16 @@
-% !TEX TS-program = lualatex
+%!TEX TS-program = lualatex
 % Original TS-program:
 % - xelatex (no support for emoji)
 % - lualatex (support for emoji)
 %!TEX encoding = UTF-8 Unicode
 
 \documentclass[11pt, a4paper]{awesome-cv}
-\geometry{left=1.4cm, top=.8cm, right=1.4cm, bottom=1.8cm, footskip=.5cm}
+\input{header.tex}
 
-% Package for hidden words
-\usepackage{color}
-% Command for hidden keywords
-\newcommand{\keywords}[1]{\vspace{-8pt}{\fontsize{1}{0}\selectfont \textcolor{white}{#1}}\vspace{-8pt}}
-
-\fontdir[fonts/]
-% Color for highlights
-% Awesome Colors: awesome-emerald, awesome-skyblue, awesome-red, awesome-pink, awesome-orange
-%                 awesome-nephritis, awesome-concrete, awesome-darknight
-\colorlet{awesome}{awesome-red}
-
-% Colors for text
-% Uncomment if you would like to specify your own color
-% \definecolor{darktext}{HTML}{414141}
-% \definecolor{text}{HTML}{333333}
-% \definecolor{graytext}{HTML}{5D5D5D}
-% \definecolor{lighttext}{HTML}{999999}
-
-% Set false if you don't want to highlight section with awesome color
-\setbool{acvSectionColorHighlight}{true}
-
-%-------------------------------------------------------------------------------
-%	PERSONAL INFORMATION
-%-------------------------------------------------------------------------------
-% Available options: circle|rectangle,edge/noedge,left/right
-\photo[circle,noedge,left]{./assets/Picture CV-2-mini.jpg}
-\name{Marco}{Di Francesco}
-% \position{Data Scientist{\enskip\cdotp\enskip}Machine Learning Engineer}
-\position{Machine Learning Engineer}
-\address{Via Silvio Calloni 2, 6900 Lugano, Switzerland}
-
-% === Normal Links
-% \mobile{+39 3476692467}
-\mobile{\emoji{flag-denmark} +45 91839615}
-\email{marcodifran@gmail.com}
-% \github{marcodifrancesco}
-\linkedin{MarcoDiFran}
-\homepage{marcodifrancesco.com}
-% === Other Links
-% \gitlab{gitlab-id}
-% \stackoverflow{SO-id}{SO-name}
-% \twitter{@twit}
-% \skype{skype-id}
-% \reddit{reddit-id}
-% \medium{madium-id}
-% \googlescholar{googlescholar-id}{name-to-display}
-%% \firstname and \lastname will be used
-% \googlescholar{googlescholar-id}{}
-% \extrainfo{extra informations}
-
-% \quote{``Be the change that you want to see in the world."}
-%-------------------------------------------------------------------------------
 \begin{document}
 
-
-% Print the header with above personal informations
 % Give optional argument to change alignment(C: center, L: left, R: right)
 \makecvheader[R]
-
-% Print the footer with 3 arguments(<left>, <center>, <right>)
-% Leave any of these blank if they are not needed
-\makecvfooter
-  {\today}
-  {Marco Di Francesco~~~·~~~Résumé}
-  {}
 
 
 %==== SUMMARY
@@ -86,6 +25,7 @@
 % I'm a recent graduate with experience as a data scientist in a research context, collaborating closely with PhDs to design, develop, and deploy deep learning models for computer vision in the fields of weather forecasting and biomedicine for long-term projects. My responsibilities included designing model architecture, developing in PyTorch, and implementing evaluation pipelines in Azure. Moreover, in the past year, I worked on researching and implementing an efficient learning model in Rust to handle streaming data in the robotic context at ABB. I passionate about this field and always keeping up to date with new technologies.
 
 \end{cvparagraph}
+
 
 %==== WORK EXPERIENCE
 \cvsection{Work Experience}
