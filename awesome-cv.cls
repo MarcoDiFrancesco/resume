@@ -446,7 +446,7 @@
     \setlength{\headertextwidth}{\textwidth}
     \setlength{\headerphotowidth}{0cm}
   }{%
-    \setlength{\headertextwidth}{0.76\textwidth}
+    \setlength{\headertextwidth}{0.75\textwidth}
     \setlength{\headerphotowidth}{0.24\textwidth}
   }%
   \begin{minipage}[c]{\headerphotowidth}%
@@ -758,10 +758,12 @@
 % Usage: \makeletterclosing
 \newcommand*{\makeletterclosing}{%
   \vspace{3.4mm}
-  \lettertextstyle{\@letterclosing} \\\\
+  % \lettertextstyle{\@letterclosing} \\\\
+  \lettertextstyle{\@letterclosing} \par
   \letternamestyle{\@firstname\ \@lastname}
   \ifthenelse{\isundefined{\@letterenclosure}}
-    {\\}
+    % {\\}
+    {\par}
     {%
       \\\\\\
       \letterenclosurestyle{\@letterenclname: \@letterenclosure} \\

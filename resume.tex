@@ -32,31 +32,31 @@
 
 \begin{cventries}
 %---------------------------------------------------------
-  \cventry
+\cventry
+% "Bruno Kessler Foundation" is not the english name
+  {Fondazione Bruno Kessler (Research Center)}
+  {Data Scientist}
+  {Italy, Trento}
+  {3 years (Jan 2020 - Dec 2022), 40\%}
+  {
+    \begin{cvitems}
+      \item {Developed, trained, and optimized computer vision model for \href{https://marcodifrancesco.com/assets/img/nowcasting-thesis/nowcasting-presentation.pdf}{weather forecasting models in PyTorch}. Created MLOps infrastructure for model deployment using Docker, and integrated into production with Azure Functions using CI/CD.}
+      \item {Implemented computer vision model for cyst segmentation in PyTorch, and improved model accuracy through semi-3D pre-processing. Paper: \href{https://www.nature.com/articles/s41598-024-52677-1}{[Monaco S. et al. (2024)]}.}
+      \item {Developed a Python dashboard in Plotly to derive insights from air quality data, with 10GB+ Postgres backend. Deployed on Azure SQL Database, and dashboard on a Linux Virtual Machine in Azure.}
+    \end{cvitems}
+  }
+%---------------------------------------------------------
+\cventry
     {ABB}
     {Thesis Work}
     {Sweden, Västerås}
     {6 months (Feb 2024 - Jul 2024)}
     {
-      \begin{cvitems} % Description(s) of tasks/responsibilities
+      \begin{cvitems}
         % \item {Project: Design and Application of a Machine Learning Framework for Real World Systems in an Automation Environment.}
-        \item {Developed and deployed an Online Learning model in Rust to handle robot streaming data, enhancing the accuracy of robotic arm by 55\%.}
-        \item {Enhanced model scalability with Rust, achieving a 28x speedup compared to its Python implementation in Scikit-learn/River, optimizing performance for real-world applications.}
+        \item {Developed and deployed an Online Learning model to handle robot streaming data, to optimize performance for real-world applications.}
+        \item {Improved model scalability with Rust, achieving a 28x speedup compared to its Python implementation in Scikit-learn/River.}
         \item {Implemented MLFlow for experiment tracking and model versioning.}
-      \end{cvitems}
-    }
-%---------------------------------------------------------
-  \cventry
-  % "Bruno Kessler Foundation" is not the english name
-    {Fondazione Bruno Kessler (Research Center)}
-    {Data Scientist}
-    {Italy, Trento}
-    {3 years (Jan 2020 - Dec 2022), 40\%}
-    {
-      \begin{cvitems} % Description(s) of tasks/responsibilities
-        \item {Developed, trained, and optimized hyperparameters of \href{https://marcodifrancesco.com/assets/img/nowcasting-thesis/nowcasting-presentation.pdf}{weather forecasting models using computer vision models in PyTorch}. Established MLOps infrastructure for model deployment using Docker, and integrated into production with Azure Functions using CI/CD.}
-        \item {Implemented a model for cyst segmentation with PyTorch torchvision, and enhanced model accuracy through advanced pre-processing techniques. Paper: \href{https://www.nature.com/articles/s41598-024-52677-1}{[Monaco S. et al. (2024)]}.}
-        \item {Developed a Python dashboard to derive insights from air quality data, focusing on feature engineering and processing large datasets (10GB+). Deployed the database on Azure SQL Database, and the dashboard on a Linux virtual machine, ensuring robust data handling.}
       \end{cvitems}
     }
 %---------------------------------------------------------
@@ -69,12 +69,12 @@
 \begin{cventries}
 %---------------------------------------------------------
   \cventry
-    {Aalto University + University of Twente} % Institution
-    {Master in Data Science} % Degree
-    {Finland, Espoo + Netherlands, Enschede} % Location
-    {2022 - 2024} % Date(s)
+    {Aalto University + University of Twente}
+    {Master in Data Science}
+    {Finland, Espoo + Netherlands, Enschede}
+    {2022 - 2024}
     {
-      \begin{cvitems} % Description(s) bullet points
+      \begin{cvitems}
         \item {Major in Data Science - Minor in Innovation \& Entrepreneurship. Graduated with Honours. GPA: 3.3 / 4.0.}
         \item {Specialization courses: Data Mining, Complex Networks, Natural Language Processing, Big Data.}
         \item {Awarded Dean’s Scholarship by Aalto University for good Academic Performance + Tuition waiver given to most promising students.}
@@ -82,12 +82,12 @@
     }
 %---------------------------------------------------------
   \cventry
-    {University of Trento} % Institution
-    {Bachelor in Computer Science} % Degree
-    {Italy, Trento} % Location
-    {2018 - 2022} % Date(s)
+    {University of Trento}
+    {Bachelor in Computer Science}
+    {Italy, Trento}
+    {2018 - 2022}
     {
-      \begin{cvitems} % Description(s) bullet points
+      \begin{cvitems}
         \item {Specialization courses: Machine Learning, Data Structures and Algorithms, Calculus, and Software Engineering. Final grade: 95 / 110.}
         \item {Final Project: “Comparative Analysis of Prediction Models for Short-Term Forecasting”}
       \end{cvitems}
@@ -103,25 +103,27 @@
 %---------------------------------------------------------
   \cvskill
     {Prog. Languages}
-    % Awalws show: Python, SQL
-    % Optional: Javascript, Bash, C++
-    {Python, Apache Spark (PySpark), SQL, Rust, Java, C, R.}
+    % Awalws show: Python, SQL, Rust
+    % Optional: Apache Spark (PySpark), Bash, C, C++, R, Java
+    {Python, SQL, Rust.}
 %---------------------------------------------------------
   \cvskill
-    {ML Libraries}
-    % Awalws show: PyTorch
-    % Optional: Matplotlib, Pandas, River, LightRiver (Online Machine Learning)
-    {PyTorch, Scikit-Learn, and Numpy (ML and DL in Python), ONNX.}
+    {Libraries}
+    % Awalws show: PyTorch, Scikit-Learn
+    % Optional: Numpy, ONNX, Matplotlib, Pandas, Streamlit, Plotly, River, LightRiver (Online Machine Learning)
+    {PyTorch, Scikit-Learn.}
 %---------------------------------------------------------
   \cvskill
     {Technologies}
-    % Awalws show: Docker, Linux, CI/CD, SQL DB
-    % Optional: Testing, Agile, Scrum
-    {Docker (Compose), Linux (Shell), CI/CD (Github Actions, Travis CI), SQL DB (Postgres, SQLite), NoSQL (MongoDB), Git, Nginx.}
+    % Awalws show: Docker (Compose), Linux (Shell), CI/CD, SQL DB
+    % Optional: Testing, Agile, Scrum, Travis CI, Git, Nginx
+    {Docker (Compose), Linux (Shell), CI/CD (Github Actions), SQL DB (Postgres, SQLite), NoSQL (MongoDB).}
 %---------------------------------------------------------
   \cvskill
+    % Awalws show: Azure Functions (Serverless), Azure SQL (Postgres), Azure VMs
+    % Optional: GCP (Firestore, IAM)
     {Cloud}
-    {Azure (SQL, Functions, Blob Storage), GCP (Firestore, IAM).}
+    {Azure Functions (Serverless), Azure SQL (Postgres), Azure VMs.}
 %---------------------------------------------------------
   \cvskill
     {Languages}
