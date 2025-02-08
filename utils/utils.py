@@ -1,19 +1,10 @@
 from pathlib import Path
 import dateutil.parser
 from git import Repo
-import sys
 import os
-import webbrowser
 import subprocess
 import datetime
 import dateutil
-
-# def get_links_from_file(fname: str) -> list:
-#     with open(fname, "r") as file:
-#         links = file.readlines()
-#     # Remove trailing /n
-#     links = [link.strip() for link in links]
-#     return links
 
 
 def check_files_existance(fnames):
@@ -75,8 +66,8 @@ def get_my_address(notion_page) -> str:
     city = notion_page["properties"]["City"]["select"]["name"]
     addresses = {
         # Main cities
+        "Aarhus": "Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark",
         "Copenhagen": "Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark",
-        "Zurich": "Maneggstrasse 41, 8041 Zürich, Switzerland",
         # Switzerland
         "Basel": "Dornacherstrasse 192, 4053 Basel, Switzerland",
         "Bern": "Rathausgasse 75, 3011 Bern, Switzerland",
@@ -85,9 +76,14 @@ def get_my_address(notion_page) -> str:
         "Lucerne": "Zürichstrasse 33, 6004 Luzern, Switzerland",
         "Lugano": "Via Silvio Calloni 2, 6900 Lugano, Switzerland",
         "St Gallen": "Zürcherstrasse 28, 9000 St. Gallen, Switzerland",
+        "Zurich": "Maneggstrasse 41, 8041 Zürich, Switzerland",
         # Germany
+        "Berlin": "Weinbergsweg 1a, 10119 Berlin, Germany",
+        "Cologne": "Mauritiuswall 64-66, 50676 Köln, Germany",
         "Munich": "Senefelderstraße 1, 80336 München, Germany",
         "Hamburg": "Steintorpl. 3, 20099 Hamburg, Germany",
+        # Luxembourg
+        "Luxembourg": "2 Rue du Fort Olisy, 2261 Pafendall, Luxembourg",
         # Norway
         "Oslo": "Bunks at Rode, Københavngata 10, 0566 Oslo, Norway",
         # Austria
@@ -97,13 +93,14 @@ def get_my_address(notion_page) -> str:
     return addresses[city]
 
 
-def print_page_summary(notion_page):
-    title = "".join(notion_page["properties"]["Position"]["title"][0]["plain_text"])
-    city = notion_page["properties"]["City"]["select"]["name"]
-    my_address = get_my_address(notion_page)
+def print_page_details(notion_page):
     time_delta = datetime.datetime.now() - dateutil.parser.parse(
         notion_page["created_time"], ignoretz=True
     )
+    if company := notion_page["properties"]["Company"]["rich_text"]:
+        company = company[0]["plain_text"]
+    else:
+        company = "?"
     if time_delta.days >= 2:
         time_delta_str = f"{time_delta.days} days ago"
     if time_delta.days >= 1:
@@ -115,38 +112,49 @@ def print_page_summary(notion_page):
 
     print(
         f"""
-=== Job posting details ===
-    Title: {title}
-    Page created: {time_delta_str}
-    City: {city}
-    My Address: {my_address}
-    Phone Number: +45 91839615
+    ┌────────────────────────────────────────────────────────────────────────────
+    │ Posting
+    ├────────────┬───────────────────────────────────────────────────────────────
+    │ Title      │ {"".join(notion_page["properties"]["Position"]["title"][0]["plain_text"])}
+    │ Company    │ {company}
+    │ Page age   │ {time_delta_str}
+    └────────────┴───────────────────────────────────────────────────────────────
 """
     )
 
 
 def print_page_requirements(requirements):
-    # Experience requirements
     print(
         f"""
-    ┌──────────────────────────────────────────────────────────────────────────
-    │ Experience requirements     
-    ├──────────┬───────────────────────────────────────────────────────────────
-    │ Language │ {requirements["req_lang"]}
-    │ Student  │ {requirements["req_stud"]}
-    │ PhD      │ {requirements["req_phd"]}
-    └──────────┴───────────────────────────────────────────────────────────────
+    ┌────────────────────────────────────────────────────────────────────────────
+    │ Experience requirements
+    ├────────────┬───────────────────────────────────────────────────────────────
+    │ Language   │ {requirements["req_lang"]}
+    │ Student    │ {requirements["req_stud"]}
+    │ PhD        │ {requirements["req_phd"]}
+    └────────────┴───────────────────────────────────────────────────────────────
+
+    ┌────────────────────────────────────────────────────────────────────────────
+    │ Extra attachments
+    ├───────────┬────────────────────────────────────────────────────────────────
+    │ Letter    │ {requirements["req_letter"]}
+    │ Email     │ {requirements["req_email"]}
+    └───────────┴────────────────────────────────────────────────────────────────
 """
     )
 
-    # Requirements files
+
+def print_page_location(notion_page):
+    city = notion_page["properties"]["City"]["select"]["name"]
+    my_address = get_my_address(notion_page)
     print(
         f"""
-    ┌──────────────────────────────────────────────────────────────────────────
-    │ Extra requirements     
-    ├─────────┬────────────────────────────────────────────────────────────────
-    │ Letter  │ {requirements["req_letter"]}
-    │ Email   │ {requirements["req_email"]}
-    └─────────┴────────────────────────────────────────────────────────────────
+    ┌────────────────────────────────────────────────────────────────────────────
+    │ Location
+    ├────────────┬───────────────────────────────────────────────────────────────
+    │ City       │ {city}
+    │ My Address │ {my_address}
+    │ Phone      │ +45 91839615
+    └────────────┴───────────────────────────────────────────────────────────────
 """
     )
