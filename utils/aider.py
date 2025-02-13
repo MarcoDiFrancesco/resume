@@ -1,13 +1,13 @@
 from aider.coders import Coder
 from aider.models import Model
-from utils.utils import check_files_existance
+from utils.utils import files_exist
 import sys
 import os
 import time
 
 INSTRUCTIONS = rf"""
 Intrustions:
-- For every change you do the tone must remain modest, factual, and free from buzzwords and corporate jargon. Never use adjectives or superlative words like: 'complex', 'strong', 'leveraging', 'seamless', etc.
+- For every change you do the tone must remain modest, factual, and free from buzzwords and corporate jargon. Never use adjectives or superlative words like: 'best', 'complex', 'strong', 'leveraging', 'seamless' etc.
 - Do not ask me 'Run shell command?', or any other command.
 """
 
@@ -18,8 +18,6 @@ PROMPT_HEADER_ADDRESS = rf"""
 Make the following changes in header.tex
 - Check if \address in is the one specified in JOB_DESCRIPTION.md under 'My Address'. 
     If not, update it to be exactly the one specified in JOB_DESCRIPTION.md.
-- Check if \position has a suitable job title: e.g. Data Scientist or Machine Learning Engineer.
-    If not, update it according to the job description in JOB_DESCRIPTION.tex.
 """
 
 PROMPT_RESUME_SUMMARY_WORK = rf"""
@@ -46,7 +44,7 @@ In section 'Education':
 In section 'Relevant Technologies':
 - Write the technologies specified in 'Always show' + choose the most relevant ones between 'Optional' and the ones in ***bold italic*** in the job posting.
 - If technologies in the job posting are not in ***bold italic*** do not add them.
-- Use at least 4 technologies for each section.
+- Use between 5 and 8 technologies for each section.
 """
 
 
@@ -95,7 +93,7 @@ class Aider:
         self.coder: Coder = Coder.create(main_model=self.model, auto_commits=False)
 
     def _add_files(self, fnames):
-        check_files_existance(fnames)
+        files_exist(fnames)
         for fname in fnames:
             self.coder.add_rel_fname(fname)
 

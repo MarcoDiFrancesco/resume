@@ -3,7 +3,7 @@ import os
 import datetime
 from datetime import timedelta
 from notion2md.exporter.block import StringExporter
-from utils.utils import check_page_content
+from utils.utils import page_is_underlined
 from utils.utils import get_my_address
 from md2notionpage import core
 
@@ -24,12 +24,13 @@ class Notion:
         return query
 
     def next_posting(self):
-        """Fetch all postings 'Not Applied' and return one.
-        NOTE:
-            - new bahaviour: return the position in the middle.
-            - old behaviour: return first all the non-senior positions.
+        """Fetch 'Not Applied' postings and return first with priority.
+
+        Priority:
+            1. posting with city specified: since underlining was probably already present
+            2. oldest posting first
+            3. company name: replicating a random choice, but deterministic
         """
-        # print string
         print_string = "[📂] Notion"
         print(f"{print_string} - Fetching postings...", end="\r")
         query = self._query_db(
@@ -39,14 +40,22 @@ class Notion:
             },
             sorts=[
                 {
-                    "property": "Senior position",
+                    "property": "City",
                     "direction": "ascending",
-                }
+                },
+                {
+                    "property": "_Day",
+                    "direction": "ascending",
+                },
+                {
+                    "property": "Company",
+                    "direction": "ascending",
+                },
             ],
         )
         if len(query["results"]) == 0:
             return None
-        next_posting = query["results"][len(query["results"]) // 2]
+        next_posting = query["results"][0]
         print(f"{print_string} - Fetched {len(query["results"])} postings   ")
         return next_posting
 
@@ -105,7 +114,7 @@ class Notion:
                         "select": {"equals": "Applied"},
                     },
                     {
-                        "property": "Resume / Cover Letter",
+                        "property": "Files",
                         "files": {"is_empty": True},
                     },
                 ]
@@ -248,14 +257,13 @@ class Notion:
         """
         job_title = notion_page["properties"]["Position"]["title"][0]["plain_text"]
         job_city = notion_page["properties"]["City"]["select"]["name"]
-        res = "# Job Properties"
-        res += f"Title: {job_title}"
-        res += f"City: {job_city}"
-        res += f"My Address: {get_my_address(notion_page)}"
-        res += ""
-        res += f"# Job Description"
+        res = "# Job Properties\n"
+        res += f"Title: {job_title}\n"
+        res += f"City: {job_city}\n"
+        res += f"My Address: {get_my_address(notion_page)}\n\n"
+        res += f"# Job Description\n"
         res += self.get_page_descr(notion_page)
-        while not check_page_content(res):
+        while not page_is_underlined(res):
             input(
                 "[🖊] Underline check faliled. Underline text in italic-bold in Notion page. When done press Enter..."
             )

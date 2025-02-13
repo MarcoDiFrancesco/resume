@@ -6,3 +6,4 @@ notion-client==2.3.0
 notion2md==2.9.0
 groq==0.15.0
 md2notionpage==0.1.5
+streamlit==1.42.0

@@ -98,8 +98,8 @@ class Llm:
             "llama-3.3-70b-versatile",
             r"""
             Check if the markdown syntax is correct. If not, fix it.
+            Remove all **bold** and *italic* formatting.
             Output only the markdown.
-            Remove all **bold** and *italic* text, but keep formatting in ***bold italic***.
             Syntax:
                 - if there is a list, use '-' instead of '*'.
                 - do not use html tags like '<br/>'.

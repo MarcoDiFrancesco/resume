@@ -7,7 +7,7 @@ import datetime
 import dateutil
 
 
-def check_files_existance(fnames):
+def files_exist(fnames):
     """Check if all input files are present."""
     for f in fnames:
         if not Path(f).exists():
@@ -16,7 +16,7 @@ def check_files_existance(fnames):
             )
 
 
-def check_page_content(page_content: str) -> str:
+def page_is_underlined(page_content: str) -> str:
     """Check if page content has italic-bold markdown text."""
     if "***" in page_content:
         return True
@@ -144,7 +144,7 @@ def print_page_requirements(requirements):
     )
 
 
-def print_page_location(notion_page):
+def print_page_location_info(notion_page):
     city = notion_page["properties"]["City"]["select"]["name"]
     my_address = get_my_address(notion_page)
     print(
@@ -154,7 +154,7 @@ def print_page_location(notion_page):
     ├────────────┬───────────────────────────────────────────────────────────────
     │ City       │ {city}
     │ My Address │ {my_address}
-    │ Phone      │ +45 91839615
+    │ My Phone   │ +45 91839615
     └────────────┴───────────────────────────────────────────────────────────────
 """
     )
