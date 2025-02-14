@@ -1,20 +1,21 @@
-from notion_client import Client
-import os
 import datetime
+import os
 from datetime import timedelta
-from notion2md.exporter.block import StringExporter
-from utils.utils import page_is_underlined
-from utils.utils import get_my_address
-from md2notionpage import core
-import streamlit as st
+
 import dateutil
+import streamlit as st
+from md2notionpage import core
+from notion2md.exporter.block import StringExporter
+from notion_client import Client
+
+from utils.utils import get_my_address, page_is_underlined
 
 
 class Notion:
     def __init__(self, db_id: str):
         self.notion = Client(auth=os.environ["NOTION_API_TOKEN"])
         self.db_id = db_id
-        self.page = None
+        self.page
 
     def _query_db(self, **kwargs):
         query = self.notion.databases.query(
@@ -87,12 +88,6 @@ class Notion:
                 txt_print.format(len(query["results"]), title, company, time_delta_str)
             )
 
-    def fix_page_descr(self):
-        txt_box = st.text("[📂] Notion - Fixing page description...")
-        page_descr = self.get_descr()
-
-        txt_box.text("[📂] Notion - Fixing page description - Successful")
-
     def check_duplicate_page(self) -> None:
         """
         Check for other postings with the same URL with and without trailing slash.
@@ -155,13 +150,25 @@ class Notion:
 
         def _check_property_city():
             if not self.page["properties"]["City"]["select"]:
-                st.text(f"📑 Check failed. Property 'City' is empty")
+                st.markdown(
+                    f"📑 Property *City* in [Notion page]({self.page['url']}) is empty → Reload Streamlit page to check again"
+                )
                 return False
             return True
 
         def _check_property_company():
             if not self.page["properties"]["Company"]["rich_text"]:
-                st.text(f"📑 Check failed. Property 'Company' is empty")
+                st.markdown(
+                    f"📑 Property *Company* in [Notion page]({self.page['url']}) is empty → Reload Streamlit page to check again"
+                )
+                return False
+            return True
+
+        def _check_page_underlined():
+            if not page_is_underlined(self.get_descr()):
+                st.markdown(
+                    f"❌ Job description in [Notion page]({self.page['url']}) not underlined in ***bold-italic*** → Reload Streamlit page to check again"
+                )
                 return False
             return True
 
@@ -175,20 +182,40 @@ class Notion:
         )
         assert len(query["results"]) == 1, "Duplicate posting with same URL."
         self.page = query["results"][0]
-        if all(
+        return all(
             [
                 _check_property_city(),
                 _check_property_company(),
+                _check_page_underlined(),
             ]
-        ):
-            return True
-        st.text(
-            f"❌ Underline Notion page in bold-italic in Notion page → Then reload Streamlit page"
         )
-        return False
 
     def get_descr(self):
         return StringExporter(block_id=self.page["id"]).export()
+
+    def get_descr_with_props(self) -> str:
+        """Returns Notion page details in markdown. Includes both properties and body.
+
+        Example:
+        ```
+        # Job Properties
+        Title: Data Science Internship at Example
+        City: Zurich
+        ===
+        # Job Description
+        ## About the job
+        This is your turn to apply at...
+        ```
+        """
+        job_title = self.page["properties"]["Position"]["title"][0]["plain_text"]
+        job_city = self.page["properties"]["City"]["select"]["name"]
+        res = "# Job Properties\n"
+        res += f"Title: {job_title}\n"
+        res += f"City: {job_city}\n"
+        res += f"My Address: {get_my_address(self.page)}\n\n"
+        res += f"# Job Description\n"
+        res += self.get_descr()
+        return res
 
     def new_page(self, page_descr):
         """
@@ -207,7 +234,7 @@ class Notion:
         title = self.page["properties"]["Position"]["title"][0]["plain_text"]
         stage = self.page["properties"]["Stage"]["select"]["name"]
         url = self.page["properties"]["URL"]["url"]
-        # If time is before 6am, consider the application date as the previous day
+        # If time is before 6am set as previous day
         date = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
         properties = {
             "Position": {"title": [{"text": {"content": title}}]},
@@ -237,36 +264,6 @@ class Notion:
             archived=True,
         )
         self.page = None
-
-    def get_markdown(self) -> str:
-        """Returns Notion page details in markdown. Includes both properties and body.
-
-        Example:
-        ```
-        # Job Properties
-        Title: Data Science Internship at Example
-        City: Zurich
-        ===
-        # Job Description
-        ## About the job
-        This is your turn to apply at...
-        ```
-        """
-        job_title = self.page["properties"]["Position"]["title"][0]["plain_text"]
-        job_city = self.page["properties"]["City"]["select"]["name"]
-        res = "# Job Properties\n"
-        res += f"Title: {job_title}\n"
-        res += f"City: {job_city}\n"
-        res += f"My Address: {get_my_address(self.page)}\n\n"
-        res += f"# Job Description\n"
-        res += self.get_descr(self.page)
-        while not page_is_underlined(res):
-            if st.button(
-                "[🖊] Underline check faliled. Underline text in italic-bold in Notion page. When done press Enter..."
-            ):
-                continue
-            res = self.get_markdown(self.page)
-        return res
 
     def set_applied(self) -> None:
         txt_box = st.text(f"[📑] Setting page to 'Applied'...")

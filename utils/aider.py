@@ -1,10 +1,12 @@
+import os
+import sys
+import time
+
+import streamlit as st
 from aider.coders import Coder
 from aider.models import Model
+
 from utils.utils import files_exist
-import sys
-import os
-import time
-import streamlit as st
 
 INSTRUCTIONS = rf"""
 Intrustions:
@@ -17,7 +19,7 @@ PROMPT_HEADER_ADDRESS = rf"""
 (Prompt Header - v7)
 
 Make the following changes in header.tex
-- Check if \address in is the one specified in JOB_DESCRIPTION.md under 'My Address'. 
+- Check if \address in is the one specified in JOB_DESCRIPTION.md under 'My Address'.
     If not, update it to be exactly the one specified in JOB_DESCRIPTION.md.
 """
 

@@ -1,11 +1,12 @@
-from pathlib import Path
-import dateutil.parser
-from git import Repo
+import datetime
 import os
 import subprocess
-import datetime
+from pathlib import Path
+
 import dateutil
+import dateutil.parser
 import streamlit as st
+from git import Repo
 
 
 def files_exist(fnames):
@@ -13,11 +14,11 @@ def files_exist(fnames):
     for f in fnames:
         if not Path(f).exists():
             raise FileNotFoundError(
-                f"[📂] File not found '{f}'. Is it the right directory?"
+                f"[📂] File not found '{f}'. Did you run the script in the 'resume' directory?"
             )
 
 
-def page_is_underlined(page_content: str) -> str:
+def page_is_underlined(page_content: str) -> bool:
     """Check if page content has italic-bold markdown text."""
     if "***" in page_content:
         return True

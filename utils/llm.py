@@ -1,8 +1,9 @@
-from openai import OpenAI
-from groq import Groq
 import concurrent.futures
-import streamlit as st
 import time
+
+import streamlit as st
+from groq import Groq
+from openai import OpenAI
 
 
 class Llm:
@@ -35,7 +36,7 @@ class Llm:
         resp = response.choices[0].message.content
         return resp
 
-    def _groq_query(self, model: str, query: str, data: dict) -> dict:
+    def _groq_query(self, model: str, query: str, data: str) -> str:
         chat_completion = self.groq.chat.completions.create(
             model=model,
             temperature=0,
@@ -115,35 +116,28 @@ class Llm:
 
     def query_page_descr(self, page_descr: str) -> str:
         """Fix markdown syntax with LLM."""
-        time_start = time.time()
-        txt_print = "🗣️ LLM - Query markdown fix - Old description lines: {} - New description lines: {} - Time: {:.1f} sec"
-
-
-        
-        txt_box = st.text(txt_print.format(page_descr.count("\n"), "...", 0))
-        page_descr_new = self._groq_query(
-            "llama-3.3-70b-versatile",
-            r"""
-            Check if the markdown syntax is correct. If not, fix it.
-            Remove all **bold** and *italic* formatting.
-            Output only the markdown.
-            Syntax:
-                - if there is a list, use '-' instead of '*'.
-                - do not use html tags like '<br/>'.
-                - never use leading spaces in the beginning of the line.
-            """,
-            page_descr,
-        )
-        txt_box.text(
-            txt_print.format(
-                page_descr.count("\n"),
-                page_descr_new.count("\n"),
-                time.time() - time_start,
+        with st.status("Markdown fix with LLM"):
+            time_start = time.time()
+            page_descr_new = self._groq_query(
+                "llama-3.3-70b-versatile",
+                r"""
+                Check if the markdown syntax is correct. If not, fix it.
+                Remove all **bold** and *italic* formatting.
+                Output only the markdown.
+                Syntax:
+                    - if there is a list, use '-' instead of '*'.
+                    - do not use html tags like '<br/>'.
+                    - never use leading spaces in the beginning of the line.
+                    - preserve line breaks as in the original text, including double line breaks (\n\n).
+                """,
+                page_descr,
             )
-        )
-        with st.expander("🗣️ Markdown comparison"):
-            st.text("📝 Old description")
-            st.code(page_descr)
-            st.text("📝 New description")
-            st.code(page_descr_new)
+            st.text(f"Time to execute query: {time.time() - time_start:.1f} sec.")
+            c1, c2 = st.columns([1, 1])
+            with c1:
+                st.text("📝 Old description")
+                st.code(page_descr, wrap_lines=True)
+            with c2:
+                st.text("📝 New description")
+                st.code(page_descr_new, wrap_lines=True)
         return page_descr_new
