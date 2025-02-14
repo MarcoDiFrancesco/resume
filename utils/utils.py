@@ -5,6 +5,7 @@ import os
 import subprocess
 import datetime
 import dateutil
+import streamlit as st
 
 
 def files_exist(fnames):
@@ -28,8 +29,6 @@ def copy_text_to_file(text: str, fname: str):
     with open(fname, "w") as file:
         file.write(text)
 
-    print("[📂] Notion page content copied to JOB_DESCRIPTION.md")
-
 
 def reset_git_changes(fname):
     """
@@ -45,14 +44,13 @@ def reset_git_changes(fname):
     if fname in changed_files:
         # Reset git changes. Only unstaged changes are reset.
         repo.git.checkout("--", fname)
-        print(f"[📌] Git changes in '{fname}' were reset.")
+        st.text(f"[📌] Git changes in '{fname}' were reset.")
 
 
 def browser_open_silent(link):
     """Open link in browser without printing debug output."""
     with open(os.devnull, "w") as devnull:
         subprocess.Popen(["open", link], stdout=devnull, stderr=devnull)
-    print(f"[🌐] Opened in browser: {link}")
 
 
 def get_my_address(notion_page) -> str:
@@ -80,6 +78,7 @@ def get_my_address(notion_page) -> str:
         # Germany
         "Berlin": "Weinbergsweg 1a, 10119 Berlin, Germany",
         "Cologne": "Mauritiuswall 64-66, 50676 Köln, Germany",
+        "Frankfurt": "Moselstraße 40, 60329 Frankfurt, Germany",
         "Munich": "Senefelderstraße 1, 80336 München, Germany",
         "Hamburg": "Steintorpl. 3, 20099 Hamburg, Germany",
         # Luxembourg
@@ -93,68 +92,17 @@ def get_my_address(notion_page) -> str:
     return addresses[city]
 
 
-def print_page_details(notion_page):
-    time_delta = datetime.datetime.now() - dateutil.parser.parse(
-        notion_page["created_time"], ignoretz=True
-    )
-    if company := notion_page["properties"]["Company"]["rich_text"]:
-        company = company[0]["plain_text"]
-    else:
-        company = "?"
-    if time_delta.days >= 2:
-        time_delta_str = f"{time_delta.days} days ago"
-    if time_delta.days >= 1:
-        time_delta_str = f"{time_delta.days} day ago"
-    elif time_delta.seconds > 60 * 60:
-        time_delta_str = f"{time_delta.seconds // (60*60)} hours ago"
-    else:
-        time_delta_str = f"{time_delta.seconds // 60} minutes ago"
-
-    print(
-        f"""
-    ┌────────────────────────────────────────────────────────────────────────────
-    │ Posting
-    ├────────────┬───────────────────────────────────────────────────────────────
-    │ Title      │ {"".join(notion_page["properties"]["Position"]["title"][0]["plain_text"])}
-    │ Company    │ {company}
-    │ Page age   │ {time_delta_str}
-    └────────────┴───────────────────────────────────────────────────────────────
-"""
-    )
-
-
-def print_page_requirements(requirements):
-    print(
-        f"""
-    ┌────────────────────────────────────────────────────────────────────────────
-    │ Experience requirements
-    ├────────────┬───────────────────────────────────────────────────────────────
-    │ Language   │ {requirements["req_lang"]}
-    │ Student    │ {requirements["req_stud"]}
-    │ PhD        │ {requirements["req_phd"]}
-    └────────────┴───────────────────────────────────────────────────────────────
-
-    ┌────────────────────────────────────────────────────────────────────────────
-    │ Extra attachments
-    ├───────────┬────────────────────────────────────────────────────────────────
-    │ Letter    │ {requirements["req_letter"]}
-    │ Email     │ {requirements["req_email"]}
-    └───────────┴────────────────────────────────────────────────────────────────
-"""
-    )
-
-
 def print_page_location_info(notion_page):
     city = notion_page["properties"]["City"]["select"]["name"]
     my_address = get_my_address(notion_page)
-    print(
+    st.code(
         f"""
-    ┌────────────────────────────────────────────────────────────────────────────
-    │ Location
-    ├────────────┬───────────────────────────────────────────────────────────────
-    │ City       │ {city}
-    │ My Address │ {my_address}
-    │ My Phone   │ +45 91839615
-    └────────────┴───────────────────────────────────────────────────────────────
-"""
+        ┌────────────────────────────────────────────────────────────────────────────
+        │ Location
+        ├────────────┬───────────────────────────────────────────────────────────────
+        │ City       │ {city}
+        │ My Address │ {my_address}
+        │ My Phone   │ +45 91839615
+        └────────────┴───────────────────────────────────────────────────────────────
+        """
     )

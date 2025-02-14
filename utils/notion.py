@@ -6,12 +6,15 @@ from notion2md.exporter.block import StringExporter
 from utils.utils import page_is_underlined
 from utils.utils import get_my_address
 from md2notionpage import core
+import streamlit as st
+import dateutil
 
 
 class Notion:
     def __init__(self, db_id: str):
         self.notion = Client(auth=os.environ["NOTION_API_TOKEN"])
         self.db_id = db_id
+        self.page = None
 
     def _query_db(self, **kwargs):
         query = self.notion.databases.query(
@@ -19,53 +22,78 @@ class Notion:
         )
         return query
 
-    def _query_blocks(self, **kwargs):
-        query = self.notion.blocks.children.list(**kwargs)
-        return query
+    # def _query_blocks(self, **kwargs):
+    #     query = self.notion.blocks.children.list(**kwargs)
+    #     return query
 
-    def next_posting(self):
-        """Fetch 'Not Applied' postings and return first with priority.
+    def fetch_page_from_db(self):
+        """Fetch 'Not Applied' posting.
 
         Priority:
             1. posting with city specified: since underlining was probably already present
             2. oldest posting first
             3. company name: replicating a random choice, but deterministic
         """
-        print_string = "[📂] Notion"
-        print(f"{print_string} - Fetching postings...", end="\r")
+        txt_print = """
+        ┌────────────────────────────────────────────────────────────────────────────
+        │ Posting ({} left)
+        ├────────────┬───────────────────────────────────────────────────────────────
+        │ Title      │ {}
+        │ Company    │ {}
+        │ Page age   │ {}
+        └────────────┴───────────────────────────────────────────────────────────────
+        """
+        txt_box = st.code(txt_print.format("...", "...", "...", "..."))
         query = self._query_db(
             filter={
-                "property": "Stage",
-                "select": {"equals": "Not Applied"},
+                "and": [
+                    {"property": "Stage", "select": {"equals": "Not Applied"}},
+                    {"property": "Unsolicited", "checkbox": {"equals": False}},
+                ]
             },
             sorts=[
-                {
-                    "property": "City",
-                    "direction": "ascending",
-                },
-                {
-                    "property": "_Day",
-                    "direction": "ascending",
-                },
-                {
-                    "property": "Company",
-                    "direction": "ascending",
-                },
+                {"property": "City", "direction": "ascending"},
+                {"property": "_Day", "direction": "ascending"},
+                {"property": "Company", "direction": "ascending"},
             ],
         )
         if len(query["results"]) == 0:
-            return None
-        next_posting = query["results"][0]
-        print(f"{print_string} - Fetched {len(query["results"])} postings   ")
-        return next_posting
+            notion_db_url = f"http://notion.so/{os.environ["NOTION_DB_ID"]}"
+            txt_box.write(
+                f"❌ No postings 'Non Applied' found in Notion DB. [Notion Database]({notion_db_url})"
+            )
+        else:
+            self.page = query["results"][0]
+            time_delta = datetime.datetime.now() - dateutil.parser.parse(
+                self.page["created_time"], ignoretz=True
+            )
+            title = "".join(
+                self.page["properties"]["Position"]["title"][0]["plain_text"]
+            )
+            if company := self.page["properties"]["Company"]["rich_text"]:
+                company = company[0]["plain_text"]
+            else:
+                company = "?"
+            if time_delta.days >= 2:
+                time_delta_str = f"{time_delta.days} days ago"
+            if time_delta.days >= 1:
+                time_delta_str = f"{time_delta.days} day ago"
+            elif time_delta.seconds > 60 * 60:
+                time_delta_str = f"{time_delta.seconds // (60*60)} hours ago"
+            else:
+                time_delta_str = f"{time_delta.seconds // 60} minutes ago"
+
+            txt_box.code(
+                txt_print.format(len(query["results"]), title, company, time_delta_str)
+            )
 
     def fix_page_descr(self):
-        print("[📂] Notion - Fixing page description...", end="\r")
-        page_descr = self.get_page_descr()
+        txt_box = st.text("[📂] Notion - Fixing page description...")
+        page_descr = self.get_descr()
 
-        print("[📂] Notion - Fixing page description - Successful")
+        txt_box.text("[📂] Notion - Fixing page description - Successful")
 
-    def check_duplicate_page(self, url: str) -> None:
+    def check_duplicate_page(self) -> None:
         """
         Check for other postings with the same URL with and without trailing slash.
         If dupicate is found, raise ValueError.
@@ -74,7 +102,8 @@ class Notion:
             - https://www.linkedin.com/jobs/view/1234567890
             - https://www.linkedin.com/jobs/view/1234567890/
         """
-        print("[Notion] Checking if page has duplicates...", end="\r")
+        # LinkedIn URL
+        url = self.page["properties"]["URL"]["url"]
         assert url, "[Notion] Check failed. URL is empty."
 
         # Add or remove trailing slash
@@ -86,26 +115,16 @@ class Notion:
         query = self._query_db(
             filter={
                 "or": [
-                    {
-                        "property": "URL",
-                        "url": {"equals": url},
-                    },
-                    {
-                        "property": "URL",
-                        "url": {"equals": url_ts},
-                    },
+                    {"property": "URL", "url": {"equals": url}},
+                    {"property": "URL", "url": {"equals": url_ts}},
                 ]
             }
         )
-
         if len(query["results"]) != 1:
             raise ValueError(f"[Notion] Check failed. Posting has duplicates: {url}")
-        print(f"[📂] Notion database check - Posting has no duplicates - Successful")
 
     def check_db_missing_files(self) -> None:
         """Check if DB contains pages which are 'Applied' but contain no documents."""
-        log_str = "[📂] Notion database check"
-        print(f"{log_str} - Checking missing files in posts...", end="\r")
         query = self._query_db(
             filter={
                 "and": [
@@ -122,107 +141,86 @@ class Notion:
         )
         # Check if there is more than one page
         if len(query["results"]) != 0:
-            err_str = f"{log_str} - Check failed. These pages are maked as 'Applied' but have no uploaded document:\n"
+            err_str = f"[📂] Notion database check - Check failed. These pages are maked as 'Applied' but have no uploaded document:\n"
             for page in query["results"]:
                 err_str += f"  - {page['url']}\n"
             raise ValueError(err_str)
-        print(f"{log_str} - Check missing files in posts - Successful")
 
-    def check_page_properties(self, notion_page) -> None:
+    def check_page_properties(self) -> bool:
         """
         Check the following properties:
         - City: if label is non-empty
         - Company: if text is non-empty
         """
 
-        def _check_property_city(notion_page):
-            if not notion_page["properties"]["City"]["select"]:
-                print(f"[📑] Check failed. Property 'City' is empty.")
+        def _check_property_city():
+            if not self.page["properties"]["City"]["select"]:
+                st.text(f"📑 Check failed. Property 'City' is empty")
                 return False
             return True
 
-        def _check_property_company(notion_page):
-            if not notion_page["properties"]["Company"]["rich_text"]:
-                print(f"[📑] Check failed. Property 'Company' is empty.")
+        def _check_property_company():
+            if not self.page["properties"]["Company"]["rich_text"]:
+                st.text(f"📑 Check failed. Property 'Company' is empty")
                 return False
             return True
 
-        url = notion_page["properties"]["URL"]["url"]
-        while True:
-            query = self._query_db(
-                filter={
-                    "property": "URL",
-                    "url": {"equals": url},
-                }
-            )
-            assert len(query["results"]) == 1, "Duplicate posting with same URL."
-            notion_page = query["results"][0]
-            if all(
-                [
-                    _check_property_city(notion_page),
-                    _check_property_company(notion_page),
-                ]
-            ):
-                break
-            input(f"[📑] Update properties and press Enter...")
-        return notion_page
+        url = self.page["properties"]["URL"]["url"]
 
-    def get_page_descr(self, notion_page):
-        return StringExporter(block_id=notion_page["id"]).export()
+        query = self._query_db(
+            filter={
+                "property": "URL",
+                "url": {"equals": url},
+            }
+        )
+        assert len(query["results"]) == 1, "Duplicate posting with same URL."
+        self.page = query["results"][0]
+        if all(
+            [
+                _check_property_city(),
+                _check_property_company(),
+            ]
+        ):
+            return True
+        st.text(
+            f"❌ Underline Notion page in bold-italic in Notion page → Then reload Streamlit page"
+        )
+        return False
 
-    def new_page(self, notion_page_old, page_descr):
+    def get_descr(self):
+        return StringExporter(block_id=self.page["id"]).export()
+
+    def new_page(self, page_descr):
         """
-        Copy page including title and properties
+        Create a copy of the current Notion page, overwriting page description.
+
+        Args:
+            page_descr: Page description in markdown
         """
-        print("[📂] Notion - Writing new page...", end="\r")
         try:
             page_descr_blocks = core.parse_md(page_descr)
         except KeyError:
-            print(page_descr)
+            st.code(page_descr)
             raise KeyError(
                 "[❌] LLM - Prompt output with incorrect formatting. Check prompt above."
             )
+        title = self.page["properties"]["Position"]["title"][0]["plain_text"]
+        stage = self.page["properties"]["Stage"]["select"]["name"]
+        url = self.page["properties"]["URL"]["url"]
         # If time is before 6am, consider the application date as the previous day
         date = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
         properties = {
-            "Position": {
-                "title": [
-                    {
-                        "text": {
-                            "content": notion_page_old["properties"]["Position"][
-                                "title"
-                            ][0]["plain_text"]
-                        }
-                    }
-                ]
-            },
-            "Stage": {
-                "select": {
-                    "name": notion_page_old["properties"]["Stage"]["select"]["name"]
-                }
-            },
-            "URL": {"url": notion_page_old["properties"]["URL"]["url"]},
+            "Position": {"title": [{"text": {"content": title}}]},
+            "Stage": {"select": {"name": stage}},
+            "URL": {"url": url},
             "_Day": {"date": {"start": date}},
         }
-        if notion_page_old["properties"]["Company"]["rich_text"]:
+        if company := self.page["properties"]["Company"]["rich_text"]:
             properties["Company"] = {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": notion_page_old["properties"]["Company"][
-                                "rich_text"
-                            ][0]["plain_text"]
-                        }
-                    }
-                ]
+                "rich_text": [{"text": {"content": company[0]["plain_text"]}}]
             }
-
-        if notion_page_old["properties"]["City"]["select"]:
-            properties["City"] = {
-                "select": {
-                    "name": notion_page_old["properties"]["City"]["select"]["name"]
-                }
-            }
+        if city := self.page["properties"]["City"]["select"]:
+            properties["City"] = {"select": {"name": city["name"]}}
 
         notion_page = self.notion.pages.create(
             parent={"database_id": self.db_id},
@@ -230,18 +228,17 @@ class Notion:
             children=page_descr_blocks,
             icon={"emoji": "💼"},
         )
-        print("[📂] Notion - Writing new page - Successful")
         return notion_page
 
-    def delete_page(self, notion_page) -> None:
-        print("[📂] Notion - Deleting old page...", end="\r")
+    def delete_page(self) -> None:
+        """Move notion from database to trash."""
         self.notion.pages.update(
-            page_id=notion_page["id"],
+            page_id=self.page["id"],
             archived=True,
         )
-        print("[📂] Notion - Deleting old page - Successful")
+        self.page = None
 
-    def get_page_full_content(self, notion_page) -> str:
+    def get_markdown(self) -> str:
         """Returns Notion page details in markdown. Includes both properties and body.
 
         Example:
@@ -255,27 +252,28 @@ class Notion:
         This is your turn to apply at...
         ```
         """
-        job_title = notion_page["properties"]["Position"]["title"][0]["plain_text"]
-        job_city = notion_page["properties"]["City"]["select"]["name"]
+        job_title = self.page["properties"]["Position"]["title"][0]["plain_text"]
+        job_city = self.page["properties"]["City"]["select"]["name"]
         res = "# Job Properties\n"
         res += f"Title: {job_title}\n"
         res += f"City: {job_city}\n"
-        res += f"My Address: {get_my_address(notion_page)}\n\n"
+        res += f"My Address: {get_my_address(self.page)}\n\n"
         res += f"# Job Description\n"
-        res += self.get_page_descr(notion_page)
+        res += self.get_descr(self.page)
         while not page_is_underlined(res):
-            input(
+            if st.button(
                 "[🖊] Underline check faliled. Underline text in italic-bold in Notion page. When done press Enter..."
-            )
-            res = self.get_page_full_content(notion_page)
+            ):
+                continue
+            res = self.get_markdown(self.page)
         return res
 
-    def set_applied(self, notion_page) -> None:
-        print(f"[📑] Setting page to 'Applied'...", end="\r")
+    def set_applied(self) -> None:
+        txt_box = st.text(f"[📑] Setting page to 'Applied'...")
         self.notion.pages.update(
-            page_id=notion_page["id"],
+            page_id=self.page["id"],
             properties={
                 "Stage": {"select": {"name": "Applied"}},
             },
         )
-        print(f"[📑] Page set to 'Applied'.      ")
+        txt_box.text(f"[📑] Page set to 'Applied'.      ")

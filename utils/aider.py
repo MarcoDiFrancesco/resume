@@ -4,6 +4,7 @@ from utils.utils import files_exist
 import sys
 import os
 import time
+import streamlit as st
 
 INSTRUCTIONS = rf"""
 Intrustions:
@@ -55,6 +56,7 @@ In section 'Relevant Projects':
 - Comment the projects which are irrelevant. Uncomment the ones are relevant.
 - Rank them by relevance for this job posting.
 - Keep exactly 3 projects.
+- Keep same length of the sentences.
 """
 
 PROMPT_RESUME_ADD_KEYWORDS = rf"""
@@ -98,7 +100,7 @@ class Aider:
             self.coder.add_rel_fname(fname)
 
     def _prompt(self, prompt, file, num, tot):
-        print(f"[Aider] - {file} prompt {num}/{tot}. Running...", end="\r")
+        txt_box = st.text(f"[Aider] - {file} prompt {num}/{tot}. Running...")
         start = time.time()
 
         # Execute `self.coder.run(prompt)` disabling output.
@@ -109,7 +111,7 @@ class Aider:
         sys.stdout = original_stdout
 
         end = time.time()
-        print(
+        txt_box.text(
             f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec. Session cost: {self.coder.total_cost:.2f}$"
         )
 
@@ -133,25 +135,11 @@ class Aider:
         """
         Update coverletter.tex with Aider.
         """
-        while True:
-            inpt = input(
-                "[Aider] Cover Letter not requested. Update it anyway? [y/n]: "
-            )
-            if inpt == "y":
-                break
-            elif inpt == "n":
-                return
         self._reset()
         self._add_files(["JOB_DESCRIPTION.md", "resume.tex", "coverletter.tex"])
         self._prompt(PROMPT_LETTER, "Cover Letter", 1, 1)
 
     def update_email(self):
-        while True:
-            inpt = input("[Aider] Email not provided. Update it anyway? [y/n]: ")
-            if inpt == "y":
-                break
-            elif inpt == "n":
-                return
         self._reset()
         self._add_files(["JOB_DESCRIPTION.md", "resume.tex", "EMAIL_DRAFT.md"])
         self._prompt(PROMPT_EMAIL, "Email", 1, 1)

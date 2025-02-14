@@ -1,6 +1,8 @@
 from openai import OpenAI
 from groq import Groq
 import concurrent.futures
+import streamlit as st
+import time
 
 
 class Llm:
@@ -51,7 +53,6 @@ class Llm:
         return chat_completion.choices[0].message.content
 
     def fetch_requirements(self, page_content: str):
-        print("[LLM | 0/3] Fetching requirements...", end="\r")
         """
         Note: OpenAI JSON Mode suppressed
             Not used since even with Mono-query returned wrong result for:
@@ -59,7 +60,7 @@ class Llm:
                 If so return True, otherwise False"
         """
         # Requirements
-        reqs = {
+        reqs_prompt = {
             "req_lang": "Check if one or more non-English languages are strictly required for this job, replacing ... with this requirement details. If so: '❌ Language required: ...'. Otherwise: '➡️ Language requirement passed'",
             "req_stud": "Check if the candidate is required to be currently enrolled at the university, replacing ... with this requirement details. If required return: '❌ Student status required: ...'. Otherwise: '➡️ Current university student status requirement passed'",
             "req_phd": "Check if a PhD degree is strictly required. If so: '❌ PhD position required'. Otherwise: '➡️ PhD requirement passed'",
@@ -67,9 +68,23 @@ class Llm:
             "req_email": "Check if an email of a recruiter is provided for asking questions regarding the job, replacing ... with the email provided. If provided return: '✅ Email proveded: ...', otherwise '➡️ Email not provided'",
         }
         reqs_out = {}
+        reqs_print = """
+        ┌────────────────────────────────────────────────────────────────────────────
+        │ Experience requirements
+        ├────────────┬───────────────────────────────────────────────────────────────
+        │ Language   │ {}
+        │ Student    │ {}
+        │ PhD        │ {}
+        └────────────┴───────────────────────────────────────────────────────────────
 
-        debug_str = "[🗣️] LLM - Requirements"
-        print(f"{debug_str} - Fetching 5 requirements...", end="\r")
+        ┌────────────────────────────────────────────────────────────────────────────
+        │ Extra attachments
+        ├───────────┬────────────────────────────────────────────────────────────────
+        │ Letter    │ {}
+        │ Email     │ {}
+        └───────────┴────────────────────────────────────────────────────────────────
+        """
+        txt_box = st.code(reqs_print.format("...", "...", "...", "...", "..."))
 
         def fetch_requirement(req_name, req_desc, page_content):
             return req_name, self._openai_query(
@@ -82,19 +97,31 @@ class Llm:
                 executor.submit(
                     fetch_requirement, req_name, req_desc, page_content
                 ): req_name
-                for req_name, req_desc in reqs.items()
+                for req_name, req_desc in reqs_prompt.items()
             }
             for future in concurrent.futures.as_completed(futures):
                 req_name, res = future.result()
                 reqs_out[req_name] = res
 
-        print(f"{debug_str} - Fetched {len(list(reqs))} requirements      ", end="\r")
-        return reqs_out
+        txt_box.code(
+            reqs_print.format(
+                reqs_out["req_lang"],
+                reqs_out["req_stud"],
+                reqs_out["req_phd"],
+                reqs_out["req_letter"],
+                reqs_out["req_email"],
+            )
+        )
 
-    def fix_page_descr(self, page_descr: str) -> str:
-        debug_str = "[🗣️] LLM"
-        print(f"{debug_str} - Page description fix...", end="\r")
-        page_descr_fix = self._groq_query(
+    def query_page_descr(self, page_descr: str) -> str:
+        """Fix markdown syntax with LLM."""
+        time_start = time.time()
+        txt_print = "🗣️ LLM - Query markdown fix - Old description lines: {} - New description lines: {} - Time: {:.1f} sec"
+
+
+        
+        txt_box = st.text(txt_print.format(page_descr.count("\n"), "...", 0))
+        page_descr_new = self._groq_query(
             "llama-3.3-70b-versatile",
             r"""
             Check if the markdown syntax is correct. If not, fix it.
@@ -107,5 +134,16 @@ class Llm:
             """,
             page_descr,
         )
-        print(f"{debug_str} - Page description fixed           ")
-        return page_descr_fix
+        txt_box.text(
+            txt_print.format(
+                page_descr.count("\n"),
+                page_descr_new.count("\n"),
+                time.time() - time_start,
+            )
+        )
+        with st.expander("🗣️ Markdown comparison"):
+            st.text("📝 Old description")
+            st.code(page_descr)
+            st.text("📝 New description")
+            st.code(page_descr_new)
+        return page_descr_new
