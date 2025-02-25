@@ -15,7 +15,6 @@ class Notion:
     def __init__(self, db_id: str):
         self.notion = Client(auth=os.environ["NOTION_API_TOKEN"])
         self.db_id = db_id
-        self.page
 
     def _query_db(self, **kwargs):
         query = self.notion.databases.query(
@@ -61,7 +60,10 @@ class Notion:
         if len(query["results"]) == 0:
             notion_db_url = f"http://notion.so/{os.environ["NOTION_DB_ID"]}"
             txt_box.write(
-                f"❌ No postings 'Non Applied' found in Notion DB. [Notion Database]({notion_db_url})"
+                f"❌ No new posting 'Non Applied' found in Notion DB. Add new postings."
+            )
+            raise ValueError(
+                f"❌ No new posting 'Non Applied' found in Notion DB. Add new postings."
             )
         else:
             self.page = query["results"][0]
@@ -106,7 +108,6 @@ class Notion:
             url_ts = url[:-1]
         else:
             url_ts = url + "/"
-
         query = self._query_db(
             filter={
                 "or": [
@@ -115,8 +116,21 @@ class Notion:
                 ]
             }
         )
+        # Check if 2 posts have same title and same company
+        title = self.page["properties"]["Position"]["title"][0]["plain_text"]
+        company = self.page["properties"]["Company"]["rich_text"][0]["plain_text"]
+        query = self._query_db(
+            filter={
+                "and": [
+                    {"property": "Position", "title": {"equals": title}},
+                    {"property": "Company", "rich_text": {"equals": company}},
+                ]
+            }
+        )
         if len(query["results"]) != 1:
-            raise ValueError(f"[Notion] Check failed. Posting has duplicates: {url}")
+            raise ValueError(
+                f"[Notion] Check failed. Posting has duplicate with same Title '{title}' and Company '{company}'."
+            )
 
     def check_db_missing_files(self) -> None:
         """Check if DB contains pages which are 'Applied' but contain no documents."""
@@ -180,7 +194,7 @@ class Notion:
                 "url": {"equals": url},
             }
         )
-        assert len(query["results"]) == 1, "Duplicate posting with same URL."
+        assert len(query["results"]) <= 1, "Duplicate posting with same URL."
         self.page = query["results"][0]
         return all(
             [
@@ -234,8 +248,7 @@ class Notion:
         title = self.page["properties"]["Position"]["title"][0]["plain_text"]
         stage = self.page["properties"]["Stage"]["select"]["name"]
         url = self.page["properties"]["URL"]["url"]
-        # If time is before 6am set as previous day
-        date = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
+        date = self.page["properties"]["_Day"]["date"]["start"]
         properties = {
             "Position": {"title": [{"text": {"content": title}}]},
             "Stage": {"select": {"name": stage}},
@@ -265,12 +278,15 @@ class Notion:
         )
         self.page = None
 
-    def set_applied(self) -> None:
+    def set_applied_and_date(self) -> None:
         txt_box = st.text(f"[📑] Setting page to 'Applied'...")
+        # If time is before 6am set as previous day
+        date = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
         self.notion.pages.update(
             page_id=self.page["id"],
             properties={
                 "Stage": {"select": {"name": "Applied"}},
+                "_Day": {"date": {"start": date}},
             },
         )
         txt_box.text(f"[📑] Page set to 'Applied'.      ")

@@ -60,13 +60,17 @@ class Llm:
                 "Check if a cover letter or a motivation letter required.
                 If so return True, otherwise False"
         """
+        req_explain_prompt = (
+            "Replace ... with this requirement details in less than 10 words."
+        )
         # Requirements
         reqs_prompt = {
-            "req_lang": "Check if one or more non-English languages are strictly required for this job, replacing ... with this requirement details. If so: '❌ Language required: ...'. Otherwise: '➡️ Language requirement passed'",
-            "req_stud": "Check if the candidate is required to be currently enrolled at the university, replacing ... with this requirement details. If required return: '❌ Student status required: ...'. Otherwise: '➡️ Current university student status requirement passed'",
+            "req_lang": f"Check if one or more non-English languages are strictly required for this job. {req_explain_prompt}. If so: '❌ Language: ...'. Otherwise: '➡️ Language requirement passed'",
+            "req_stud": f"Check if the candidate is required to be currently enrolled at the university. {req_explain_prompt}. If required return: '❌ Student status required: ...'. Otherwise: '➡️ Current university student status requirement passed'",
             "req_phd": "Check if a PhD degree is strictly required. If so: '❌ PhD position required'. Otherwise: '➡️ PhD requirement passed'",
-            "req_letter": "Check if the cover letter or motivation letter is required, replacing ... with this requirement details. If required return: '✅ Letter required: ...', otherwise '➡️ Letter not required'",
-            "req_email": "Check if an email of a recruiter is provided for asking questions regarding the job, replacing ... with the email provided. If provided return: '✅ Email proveded: ...', otherwise '➡️ Email not provided'",
+            "req_years": f"Check if number of years of experience is specified, and 4 or more years are required. {req_explain_prompt}. If so: '❌ Years of experience required: ...'. Otherwise: '➡️ Years of experience requirement passed'",
+            "req_letter": f"Check if the cover letter or motivation letter is required. {req_explain_prompt}. If required return: '✅ Letter required: ...', otherwise '➡️ Letter not required'",
+            "req_email": "Check if an email of a recruiter is provided for asking questions regarding the job. Replace ... with the email provided. If provided return: '✅ Email proveded: ...', otherwise '➡️ Email not provided'",
         }
         reqs_out = {}
         reqs_print = """
@@ -76,6 +80,7 @@ class Llm:
         │ Language   │ {}
         │ Student    │ {}
         │ PhD        │ {}
+        │ Years      │ {}
         └────────────┴───────────────────────────────────────────────────────────────
 
         ┌────────────────────────────────────────────────────────────────────────────
@@ -85,7 +90,7 @@ class Llm:
         │ Email     │ {}
         └───────────┴────────────────────────────────────────────────────────────────
         """
-        txt_box = st.code(reqs_print.format("...", "...", "...", "...", "..."))
+        txt_box = st.code(reqs_print.format("...", "...", "...", "...", "...", "..."))
 
         def fetch_requirement(req_name, req_desc, page_content):
             return req_name, self._openai_query(
@@ -109,6 +114,7 @@ class Llm:
                 reqs_out["req_lang"],
                 reqs_out["req_stud"],
                 reqs_out["req_phd"],
+                reqs_out["req_years"],
                 reqs_out["req_letter"],
                 reqs_out["req_email"],
             )
@@ -116,28 +122,27 @@ class Llm:
 
     def query_page_descr(self, page_descr: str) -> str:
         """Fix markdown syntax with LLM."""
-        with st.status("Markdown fix with LLM"):
-            time_start = time.time()
-            page_descr_new = self._groq_query(
-                "llama-3.3-70b-versatile",
-                r"""
-                Check if the markdown syntax is correct. If not, fix it.
-                Remove all **bold** and *italic* formatting.
-                Output only the markdown.
-                Syntax:
-                    - if there is a list, use '-' instead of '*'.
-                    - do not use html tags like '<br/>'.
-                    - never use leading spaces in the beginning of the line.
-                    - preserve line breaks as in the original text, including double line breaks (\n\n).
-                """,
-                page_descr,
-            )
-            st.text(f"Time to execute query: {time.time() - time_start:.1f} sec.")
-            c1, c2 = st.columns([1, 1])
-            with c1:
-                st.text("📝 Old description")
-                st.code(page_descr, wrap_lines=True)
-            with c2:
-                st.text("📝 New description")
-                st.code(page_descr_new, wrap_lines=True)
+        time_start = time.time()
+        page_descr_new = self._groq_query(
+            "llama-3.3-70b-versatile",
+            r"""
+            Check if the markdown syntax is correct. If not, fix it.
+            Remove all **bold** and *italic* formatting.
+            Output only the markdown.
+            Syntax:
+                - if there is a list, use '-' instead of '*'.
+                - do not use html tags like '<br/>'.
+                - never use leading spaces in the beginning of the line.
+                - preserve line breaks as in the original text, including double line breaks (\n\n).
+            """,
+            page_descr,
+        )
+        st.text(f"⏱️ Time execution query: {time.time() - time_start:.1f} sec")
+        c1, c2 = st.columns([1, 1])
+        with c1:
+            st.text("📝 Old description")
+            st.code(page_descr, wrap_lines=True)
+        with c2:
+            st.text("📝 New description")
+            st.code(page_descr_new, wrap_lines=True)
         return page_descr_new

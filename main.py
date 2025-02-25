@@ -20,31 +20,31 @@ def fetch_posting():
     notion = Notion(os.environ["NOTION_DB_ID"])
     llm = Llm()
 
-    st.markdown(
-        f"📂 Notion DB: [https://notion.so/{notion.db_id}](https://notion.so/{notion.db_id})"
-    )
+    st.markdown(f"📂 [Notion DB](https://notion.so/{notion.db_id})")
     files_exist(["resume.tex"])
     notion.check_db_missing_files()
     notion.fetch_page_from_db()
     notion.check_duplicate_page()
-    if notion.page:
-        page_descr = notion.get_descr()
-        llm.fetch_requirements(page_descr)
-    else:
-        return
+    page_descr = notion.get_descr()
+    llm.fetch_requirements(page_descr)
 
-    txt_print = "📂 [Old Notion page]({}) → 📂 [New Notion page]({})"
-    txt_box = st.markdown(txt_print.format(notion.page["url"], "..."))
-    # Skip LLM rewrite if page was already underlined by me
-    if not page_is_underlined(page_descr):
-        page_descr = llm.query_page_descr(page_descr)
-        notion_page_new = notion.new_page(page_descr)
-        txt_box.markdown(txt_print.format(notion.page["url"], notion_page_new["url"]))
-        notion.delete_page()
-        notion.page = notion_page_new
-    else:
-        txt_box.markdown("📂 [Notion page]({}) (unchanged)".format(notion.page["url"]))
-    return notion
+    with st.expander("Markdown fix with LLM", icon="🗣️"):
+        txt_print = "📂 [Old Notion page]({}) → 📂 [New Notion page]({})"
+        txt_box = st.markdown(txt_print.format(notion.page["url"], "..."))
+        # Skip LLM rewrite if page was already underlined by me
+        if not page_is_underlined(page_descr):
+            page_descr = llm.query_page_descr(page_descr)
+            notion_page_new = notion.new_page(page_descr)
+            txt_box.markdown(
+                txt_print.format(notion.page["url"], notion_page_new["url"])
+            )
+            notion.delete_page()
+            notion.page = notion_page_new
+        else:
+            txt_box.markdown(
+                "📂 [Notion page]({}) (unchanged)".format(notion.page["url"])
+            )
+        return notion
 
 
 def open_browser(notion):
@@ -72,7 +72,7 @@ def update_files(notion: Notion):
             reset_git_changes("resume.tex")
             aider.update_header()
             aider.update_resume()
-            notion.set_applied()
+            notion.set_applied_and_date()
 
     if st.button("Update Cover letter", disabled=not check_pass):
         with st.status("Cover letter", expanded=True):

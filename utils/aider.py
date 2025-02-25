@@ -1,4 +1,6 @@
+import io
 import os
+import re
 import sys
 import time
 
@@ -16,53 +18,47 @@ Intrustions:
 
 PROMPT_HEADER_ADDRESS = rf"""
 {INSTRUCTIONS}
-(Prompt Header - v7)
+(Prompt Header - v8)
 
 Make the following changes in header.tex
-- Check if \address in is the one specified in JOB_DESCRIPTION.md under 'My Address'.
-    If not, update it to be exactly the one specified in JOB_DESCRIPTION.md.
+- Check if \address in is the one specified in JOB_DESCRIPTION.md under 'My Address'. If not, update it to be exactly the one specified in JOB_DESCRIPTION.md.
 """
 
 PROMPT_RESUME_SUMMARY_WORK = rf"""
 {INSTRUCTIONS}
-(Prompt Resume 1 - v7)
+(Prompt Resume 1 - v8)
 
-JOB_DESCRIPTION.md highlights skills I have in ***bold italic***. Update resume.tex to reflect only these skills or those already mentioned in the resume. Exclude skills not in bold italic, even if required in the job.
+JOB_DESCRIPTION.md highlights the skills in ***bold italic***. Update resume.tex to reflect only these skills, or those already mentioned in the resume. If a skill in the JOB_DESCRIPTION.md is not in ***bold italic*** do not mention it.
 
 In section 'Summary':
-- Update it mentioning my skill and my work experience relevant for this job. Do not mention specific technologies like Docker, Python, etc.
-- Keep a length of around 100 words.
-
-In section 'Work Experience':
-- Update the job descriptions. The changes have to be subtile, slightly modify the sentences to underline the technologies or skills if relevant.
-- Keep the numbers, and technologies mentioned.
+- Update summary mentioning my skill and my work experience relevant for this job.
+- Do not mention specific technologies like Docker, Python, etc.
+- Do not mention the paper publication.
+- Write max 100 words.
 """
 
 PROMPT_RESUME_EDU_TECH = rf"""
-(Prompt Resume 2 - v7)
+(Prompt Resume 2 - v8)
 
-In section 'Education':
-- Reorder the courses from most important to the least important. Do not change or add courses.
-
-In section 'Relevant Technologies':
-- Write the technologies specified in 'Always show' + choose the most relevant ones between 'Optional' and the ones in ***bold italic*** in the job posting.
-- If technologies in the job posting are not in ***bold italic*** do not add them.
-- Use between 5 and 8 technologies for each section.
+In section 'Relevant Technologies', for each section:
+- Write the technologies specified in 'Always show', plus add the relevant technologies in 'Optional', plus the relevant technologies in ***bold italic*** in the JOB_DESCRIPTION.md. From the JOB_DESCRIPTION.md do not add technologies if they are not underlined in ***bold italic***.
+- Rank them by relevance for this job posting.
+- Before making changes list the relevant technologies, then make the changes.
 """
 
 
 PROMPT_RESUME_PROJ = rf"""
-(Prompt Resume 3 - v7)
+(Prompt Resume 3 - v8)
 
-In section 'Relevant Projects':
-- Comment the projects which are irrelevant. Uncomment the ones are relevant.
+In section 'Extra Projects':
+- Comment the projects which are irrelevant.
 - Rank them by relevance for this job posting.
-- Keep exactly 3 projects.
-- Keep same length of the sentences.
+- Keep 4 to 6 projects.
+- Do not rewrite description.
 """
 
 PROMPT_RESUME_ADD_KEYWORDS = rf"""
-(Prompt Resume 4 - v7)
+(Prompt Resume 4 - v8)
 
 In section 'Additional Keywords':
 - Gather all the keywords missing from the resume.tex but present in JOB_DESCRIPTION.md, that would improve the resume score of an ATS keyword scanner.
@@ -70,9 +66,14 @@ In section 'Additional Keywords':
 
 PROMPT_LETTER = rf"""
 {INSTRUCTIONS}
-(Prompt Cover Letter - v7)
+(Prompt Cover Letter - v8)
 
-Update the cover letter (in coverletter.tex) to match the requirements of a new job description (in JOB_DESCRIPTION.md) for the job posting new company, considering the resume (in resume.tex). In each of the 3 sections pick up muliple points brought up from the job description and resume.
+Update the cover letter (in coverletter.tex) to match the requirements of a new job description (in JOB_DESCRIPTION.md) for the job posting new company, considering the resume (in resume.tex).
+In each of the 3 sections pick up muliple points brought up from the job description and resume.
+
+Instructions:
+- Do not mention anywhere the Nature publication.
+- Do not change the word choice and tone.
 
 Specific to 'Why Company' section:
 - Keep the reason that I want to change from a large corporation to a smaller company.
@@ -81,7 +82,7 @@ Specific to 'Why Company' section:
 
 PROMPT_EMAIL = rf"""
 {INSTRUCTIONS}
-(Prompt Email Draft - v7)
+(Prompt Email Draft - v8)
 
 Rewrite the EMAIL_DRAFT.md to fit the JOB_DESCRIPTION.md. Rewrite the 2 questions to fit the job description.
 - Keep them without corporate jargon and keep the tone very technical.
@@ -105,13 +106,15 @@ class Aider:
         txt_box = st.text(f"[Aider] - {file} prompt {num}/{tot}. Running...")
         start = time.time()
 
-        # Execute `self.coder.run(prompt)` disabling output.
-        original_stdout = sys.stdout
-        with open(os.devnull, "w") as devnull:
-            sys.stdout = devnull
-            self.coder.run(prompt)
-        sys.stdout = original_stdout
-
+        # Capture output from self.coder.run(prompt)
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        self.coder.run(prompt)
+        sys.stdout = sys.__stdout__
+        result = captured_output.getvalue()
+        # Remove aider line coloring escape sequences
+        result = re.sub(r"\x1b\[[0-9;]*m", "", result)
+        st.code(result)
         end = time.time()
         txt_box.text(
             f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec. Session cost: {self.coder.total_cost:.2f}$"

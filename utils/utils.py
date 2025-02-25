@@ -65,7 +65,7 @@ def get_my_address(notion_page) -> str:
     city = notion_page["properties"]["City"]["select"]["name"]
     addresses = {
         # Main cities
-        "Aarhus": "Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark",
+        "Aarhus": "Fiskergade 10, 8000 Aarhus Centrum, Denmark",
         "Copenhagen": "Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark",
         # Switzerland
         "Basel": "Dornacherstrasse 192, 4053 Basel, Switzerland",
@@ -82,11 +82,13 @@ def get_my_address(notion_page) -> str:
         "Frankfurt": "Moselstraße 40, 60329 Frankfurt, Germany",
         "Munich": "Senefelderstraße 1, 80336 München, Germany",
         "Hamburg": "Steintorpl. 3, 20099 Hamburg, Germany",
+        "Stuttgart": "Alexanderstraße 30, 70184 Stuttgart, Germany",
         # Luxembourg
         "Luxembourg": "2 Rue du Fort Olisy, 2261 Pafendall, Luxembourg",
         # Norway
         "Oslo": "Bunks at Rode, Københavngata 10, 0566 Oslo, Norway",
         # Austria
+        "Salzburg": "Fürbergstraße 18-20, 5020 Salzburg, Austria",
         "Vienna": "Rechte Wienzeile 35, 1040 Wien, Austria",
     }
     assert city in addresses, f"City '{city}' not found in addresses."
