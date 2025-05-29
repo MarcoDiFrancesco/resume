@@ -466,7 +466,9 @@
         {%
           \setbool{isstart}{false}%
           % \faMobile\acvHeaderIconSep\@mobile%
-          \acvHeaderIconSep\@mobile%
+          % \faPhone\acvHeaderIconSep\@mobile%
+          % \emoji{flag-denmark}\acvHeaderIconSep\@mobile%
+          \emoji{telephone-receiver}\acvHeaderIconSep\@mobile%
         }%
       \ifthenelse{\isundefined{\@email}}%
         {}%

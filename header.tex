@@ -6,10 +6,12 @@
 %-------------------------------------------------------------------------------
 \geometry{left=1.4cm, top=.8cm, right=1.4cm, bottom=1.8cm, footskip=.5cm}
 
-% Package for hidden words
-\usepackage{color}
-% Command for hidden keywords
-\newcommand{\keywords}[1]{\vspace{-8pt}{\fontsize{1}{0}\selectfont \textcolor{white}{#1}}\vspace{-8pt}}
+% Package for hidden words function
+% \usepackage{color}
+% Package for date lenth function
+% \usepackage{datenumber}
+% Package for date lenth function
+% \usepackage{xifthen}
 
 \fontdir[fonts/]
 % Color for highlights
@@ -34,13 +36,12 @@
 % Available options: circle|rectangle,edge/noedge,left/right
 \photo[circle,noedge,left]{./assets/Picture CV-2-mini.jpg}
 \name{Marco}{Di Francesco}
-% \position{Data Scientist{\enskip\cdotp\enskip}Machine Learning Engineer}
-\position{Machine Learning Engineer}
-\address{Via Silvio Calloni 2, 6900 Lugano, Switzerland}
+\position{Data Scientist{\enskip\cdotp\enskip}Machine Learning Engineer}
+% \position{Machine Learning Engineer}
+\address{Lugano, Switzerland}
 
 % === Normal Links
-% \mobile{+39 3476692467}
-\mobile{\emoji{flag-denmark} +45 91839615}
+\mobile{+41 779709103}
 \email{marcodifran@gmail.com}
 % \github{marcodifrancesco}
 \linkedin{MarcoDiFran}
@@ -92,3 +93,65 @@
 % Any enclosures with the letter
 % \letterenclosure[Attached]{Curriculum Vitae}
 
+%-------------------------------------------------------------------------------
+%	COMMANDS
+%-------------------------------------------------------------------------------
+
+% Function for hidden keywords
+\newcommand{\keywords}[1]{\vspace{-8pt}{\fontsize{1}{0}\selectfont \textcolor{white}{#1}}\vspace{-8pt}}
+
+% % Function to calculate work duration
+% % e.g. "1 year, 2 months"
+% \newcommand{\duration}[2]{%
+%   % Parameters: year, month
+%   % Calculate months between start date and now
+%   \newcount\startyear\startyear=#1
+%   \newcount\startmonth\startmonth=#2
+%   \newcount\currentyear\currentyear=\the\year
+%   \newcount\currentmonth\currentmonth=\the\month
+%   % Calculate total months difference
+%   \newcount\monthsdiff
+%   \monthsdiff=\currentmonth
+%   \advance\monthsdiff by -\startmonth
+%   \newcount\yearsinmonths
+%   \yearsinmonths=\currentyear
+%   \advance\yearsinmonths by -\startyear
+%   \multiply\yearsinmonths by 12
+%   \advance\monthsdiff by \yearsinmonths
+%   % Calculate years and remaining months
+%   \newcount\years
+%   \years=\monthsdiff
+%   \divide\years by 12
+%   \newcount\remainingmonths
+%   \remainingmonths=\monthsdiff
+%   \newcount\tempyears
+%   \tempyears=\years
+%   \multiply\tempyears by 12
+%   \advance\remainingmonths by -\tempyears
+%   % Output the result with years if applicable
+%   \ifnum\monthsdiff<12
+%     \ifnum\monthsdiff=1
+%       1 month%
+%     \else
+%       \the\monthsdiff\space months%
+%     \fi
+%   \else
+%     \ifnum\years=1
+%       \ifnum\remainingmonths=0
+%         1 year%
+%       \else\ifnum\remainingmonths=1
+%         1 year, 1 month%
+%       \else
+%         1 year, \the\remainingmonths\space months%
+%       \fi\fi
+%     \else
+%       \ifnum\remainingmonths=0
+%         \the\years\space years%
+%       \else\ifnum\remainingmonths=1
+%         \the\years\space years, 1 month%
+%       \else
+%         \the\years\space years, \the\remainingmonths\space months%
+%       \fi\fi
+%     \fi
+%   \fi
+% }
