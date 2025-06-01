@@ -35,6 +35,9 @@ In section 'Summary':
 - Do not mention specific technologies like Docker, Python, etc.
 - Do not mention the paper publication.
 - Write max 100 words.
+
+In section 'Work Experience':
+- Rank the points by relevance for this job posting.
 """
 
 PROMPT_RESUME_EDU_TECH = rf"""
@@ -51,10 +54,10 @@ PROMPT_RESUME_PROJ = rf"""
 (Prompt Resume 3 - v8)
 
 In section 'Extra Projects':
-- Comment the projects which are irrelevant.
-- Rank them by relevance for this job posting.
+- Remove the projects which are irrelevant.
 - Keep 4 to 6 projects.
-- Do not rewrite description.
+- Rank them by relevance for this job posting.
+- Do not change name or description.
 """
 
 PROMPT_RESUME_ADD_KEYWORDS = rf"""

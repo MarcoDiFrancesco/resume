@@ -58,12 +58,11 @@ class Notion:
             ],
         )
         if len(query["results"]) == 0:
-            notion_db_url = f"http://notion.so/{os.environ["NOTION_DB_ID"]}"
             txt_box.write(
-                f"❌ No new posting 'Non Applied' found in Notion DB. Add new postings."
+                f"⬆️ No new posting 'Non Applied' found. Add new postings to Notion DB."
             )
             raise ValueError(
-                f"❌ No new posting 'Non Applied' found in Notion DB. Add new postings."
+                f"❌ No new posting 'Non Applied' found. Add new postings to Notion DB."
             )
         else:
             self.page = query["results"][0]

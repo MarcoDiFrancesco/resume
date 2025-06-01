@@ -6,7 +6,6 @@ from utils.aider import Aider
 from utils.llm import Llm
 from utils.notion import Notion
 from utils.utils import (
-    browser_open_silent,
     copy_text_to_file,
     files_exist,
     page_is_underlined,
@@ -20,7 +19,9 @@ def fetch_posting():
     notion = Notion(os.environ["NOTION_DB_ID"])
     llm = Llm()
 
-    st.markdown(f"📂 [Notion DB](https://notion.so/{notion.db_id})")
+    # Button to open Notion database
+    st.link_button("📂 Notion DB", f"https://notion.so/{notion.db_id}", type="primary")
+
     files_exist(["resume.tex"])
     notion.check_db_missing_files()
     notion.fetch_page_from_db()
@@ -48,11 +49,13 @@ def fetch_posting():
 
 
 def open_browser(notion):
-    if st.button("🌐 Open Notion and LinkedIn pages", disabled=not notion):
-        notion_url = notion.page["url"]
-        linkedin_url = notion.page["properties"]["URL"]["url"]
-        browser_open_silent(linkedin_url)
-        browser_open_silent(notion_url)
+    notion_url = notion.page["url"]
+    linkedin_url = notion.page["properties"]["URL"]["url"]
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button("🌐 Open Notion", notion_url, use_container_width=True)
+    with col2:
+        st.link_button("🌐 Open LinkedIn", linkedin_url, use_container_width=True)
 
 
 def update_files(notion: Notion):
@@ -88,9 +91,11 @@ def update_files(notion: Notion):
 def main():
     st.set_page_config(layout="wide")
     c1, c2 = st.columns([1, 1])
+    # Left column for job posting info
     with c1:
-        st.header("Job posting info")
+        st.header("Posting")
         notion = fetch_posting()
+    # Right column for updating CV
     with c2:
         st.header("Update CV/Cover Letter")
         open_browser(notion)

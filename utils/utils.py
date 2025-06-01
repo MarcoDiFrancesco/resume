@@ -48,12 +48,6 @@ def reset_git_changes(fname):
         st.text(f"[📌] Git changes in '{fname}' were reset.")
 
 
-def browser_open_silent(link):
-    """Open link in browser without printing debug output."""
-    with open(os.devnull, "w") as devnull:
-        subprocess.Popen(["open", link], stdout=devnull, stderr=devnull)
-
-
 def get_my_address(notion_page) -> str:
     """
     Get address from city. Addresses are hard-coded.
@@ -67,6 +61,7 @@ def get_my_address(notion_page) -> str:
         # Main cities
         "Aarhus": "Fiskergade 10, 8000 Aarhus Centrum, Denmark",
         "Copenhagen": "Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark",
+        "Odense": "Kastruplundgade 58, 2770 Kastrup, Copenhagen, Denmark",
         # Switzerland
         "Basel": "Dornacherstrasse 192, 4053 Basel, Switzerland",
         "Bern": "Rathausgasse 75, 3011 Bern, Switzerland",
