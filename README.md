@@ -7,4 +7,4 @@ cd ~/projects/resume
 resume-finetune
 ```
 
-![images/home-screenshot.png](images/home-screenshot.png)
+![images/home-screenshot-2.png](images/home-screenshot-2.png)

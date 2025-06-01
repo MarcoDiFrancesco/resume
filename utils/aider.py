@@ -16,19 +16,11 @@ Intrustions:
 - Do not ask me 'Run shell command?', or any other command.
 """
 
-PROMPT_HEADER_ADDRESS = rf"""
-{INSTRUCTIONS}
-(Prompt Header - v8)
-
-Make the following changes in header.tex
-- Check if \address in is the one specified in JOB_DESCRIPTION.md under 'My Address'. If not, update it to be exactly the one specified in JOB_DESCRIPTION.md.
-"""
-
 PROMPT_RESUME_SUMMARY_WORK = rf"""
 {INSTRUCTIONS}
 (Prompt Resume 1 - v8)
 
-JOB_DESCRIPTION.md highlights the skills in ***bold italic***. Update resume.tex to reflect only these skills, or those already mentioned in the resume. If a skill in the JOB_DESCRIPTION.md is not in ***bold italic*** do not mention it.
+JOB_DESCRIPTION.md highlights the skills in ***bold italic***. Update resume.tex to reflect only these skills, or those already mentioned in the resume. If a skill in the JOB_DESCRIPTION.md is not in ***bold italic*** do NOT mention it.
 
 In section 'Summary':
 - Update summary mentioning my skill and my work experience relevant for this job.
@@ -40,13 +32,12 @@ In section 'Work Experience':
 - Rank the points by relevance for this job posting.
 """
 
-PROMPT_RESUME_EDU_TECH = rf"""
+PROMPT_RESUME_TECH = rf"""
 (Prompt Resume 2 - v8)
 
 In section 'Relevant Technologies', for each section:
-- Write the technologies specified in 'Always show', plus add the relevant technologies in 'Optional', plus the relevant technologies in ***bold italic*** in the JOB_DESCRIPTION.md. From the JOB_DESCRIPTION.md do not add technologies if they are not underlined in ***bold italic***.
-- Rank them by relevance for this job posting.
-- Before making changes list the relevant technologies, then make the changes.
+- Write the technologies specified in 'Always show', plus add the relevant technologies in 'Optional', plus the relevant technologies in ***bold italic*** in the JOB_DESCRIPTION.md. From the JOB_DESCRIPTION.md do NOT add technologies if they are not underlined in ***bold italic***.
+- Rank them by relevance for this job posting, starting with the most important.
 """
 
 
@@ -54,9 +45,8 @@ PROMPT_RESUME_PROJ = rf"""
 (Prompt Resume 3 - v8)
 
 In section 'Extra Projects':
-- Remove the projects which are irrelevant.
-- Keep 4 to 6 projects.
-- Rank them by relevance for this job posting.
+- Keep 4 to 6 projects removing the ones which are irrelevant.
+- Rank them by relevance for this job posting, starting with the most important.
 - Do not change name or description.
 """
 
@@ -106,6 +96,7 @@ class Aider:
             self.coder.add_rel_fname(fname)
 
     def _prompt(self, prompt, file, num, tot):
+        """Run Aider command and show progress in the dashboard as a text box."""
         txt_box = st.text(f"[Aider] - {file} prompt {num}/{tot}. Running...")
         start = time.time()
 
@@ -123,11 +114,6 @@ class Aider:
             f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec. Session cost: {self.coder.total_cost:.2f}$"
         )
 
-    def update_header(self):
-        self._reset()
-        self._add_files(["JOB_DESCRIPTION.md", "header.tex"])
-        self._prompt(PROMPT_HEADER_ADDRESS, "Header", 1, 1)
-
     def update_resume(self):
         """
         Update resume.tex with Aider to match the job description.
@@ -135,7 +121,7 @@ class Aider:
         self._reset()
         self._add_files(["JOB_DESCRIPTION.md", "resume.tex"])
         self._prompt(PROMPT_RESUME_SUMMARY_WORK, "Resume", 1, 4)
-        self._prompt(PROMPT_RESUME_EDU_TECH, "Resume", 2, 4)
+        self._prompt(PROMPT_RESUME_TECH, "Resume", 2, 4)
         self._prompt(PROMPT_RESUME_PROJ, "Resume", 3, 4)
         self._prompt(PROMPT_RESUME_ADD_KEYWORDS, "Resume", 4, 4)
 

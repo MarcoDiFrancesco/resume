@@ -8,7 +8,7 @@ from md2notionpage import core
 from notion2md.exporter.block import StringExporter
 from notion_client import Client
 
-from utils.utils import get_my_address, page_is_underlined
+from utils.utils import page_is_underlined
 
 
 class Notion:
@@ -30,9 +30,10 @@ class Notion:
         """Fetch 'Not Applied' posting.
 
         Priority:
-            1. posting with city specified: since underlining was probably already present
-            2. oldest posting first
-            3. company name: replicating a random choice, but deterministic
+            1. Posting with city specified: since underlining was probably already present
+                - City is deprecated, but kept in case I'll want it in the future
+            2. Oldest posting first
+            3. Company name: replicating a random choice, but deterministic
         """
         txt_print = """
         ┌────────────────────────────────────────────────────────────────────────────
@@ -66,9 +67,11 @@ class Notion:
             )
         else:
             self.page = query["results"][0]
-            time_delta = datetime.datetime.now() - dateutil.parser.parse(
-                self.page["created_time"], ignoretz=True
+            notion_page_time = dateutil.parser.parse(self.page["created_time"]).replace(
+                tzinfo=datetime.timezone.utc
             )
+            # Notion page age
+            time_delta = datetime.datetime.now(datetime.timezone.utc) - notion_page_time
             title = "".join(
                 self.page["properties"]["Position"]["title"][0]["plain_text"]
             )
@@ -77,13 +80,13 @@ class Notion:
             else:
                 company = "?"
             if time_delta.days >= 2:
-                time_delta_str = f"{time_delta.days} days ago"
+                time_delta_str = f"{time_delta.days} days"
             if time_delta.days >= 1:
-                time_delta_str = f"{time_delta.days} day ago"
+                time_delta_str = f"{time_delta.days} day"
             elif time_delta.seconds > 60 * 60:
-                time_delta_str = f"{time_delta.seconds // (60*60)} hours ago"
+                time_delta_str = f"{time_delta.seconds // (60*60)} hours"
             else:
-                time_delta_str = f"{time_delta.seconds // 60} minutes ago"
+                time_delta_str = f"{time_delta.seconds // 60} minutes"
 
             txt_box.code(
                 txt_print.format(len(query["results"]), title, company, time_delta_str)
@@ -161,29 +164,37 @@ class Notion:
         - Company: if text is non-empty
         """
 
-        def _check_property_city():
-            if not self.page["properties"]["City"]["select"]:
-                st.markdown(
-                    f"📑 Property *City* in [Notion page]({self.page['url']}) is empty → Reload Streamlit page to check again"
-                )
-                return False
-            return True
+        # def _check_property_city():
+        #     if not self.page["properties"]["City"]["select"]:
+        #         st.markdown(
+        #             f"📑 Property *City* in [Notion page]({self.page['url']}) is empty → Reload Streamlit page to check again"
+        #         )
+        #         return False
+        #     return True
 
         def _check_property_company():
+            err_message = st.empty()
             if not self.page["properties"]["Company"]["rich_text"]:
-                st.markdown(
-                    f"📑 Property *Company* in [Notion page]({self.page['url']}) is empty → Reload Streamlit page to check again"
+                err_message.markdown(
+                    f"📑 Property *Company* in Notion page is empty → Edit Notion page and rerun checks"
                 )
                 return False
-            return True
+            else:
+                err_message.markdown("✅ Property *Company* in Notion page found.")
+                return True
 
         def _check_page_underlined():
+            err_message = st.empty()
             if not page_is_underlined(self.get_descr()):
-                st.markdown(
-                    f"❌ Job description in [Notion page]({self.page['url']}) not underlined in ***bold-italic*** → Reload Streamlit page to check again"
+                err_message.markdown(
+                    f"❌ Highlighting of Notion page in ***bold-italic*** not found → Edit Notion page and rerun checks"
                 )
                 return False
-            return True
+            else:
+                err_message.markdown(
+                    "✅ Highlighting of Notion page in ***bold-italic*** found."
+                )
+                return True
 
         url = self.page["properties"]["URL"]["url"]
 
@@ -195,13 +206,23 @@ class Notion:
         )
         assert len(query["results"]) <= 1, "Duplicate posting with same URL."
         self.page = query["results"][0]
-        return all(
+        st.subheader("Checks")
+        checks_ok = all(
             [
-                _check_property_city(),
+                # _check_property_city(), # Deprecated, not setting working city anymore
                 _check_property_company(),
                 _check_page_underlined(),
             ]
         )
+        if st.button(
+            "🔄 Re-run checks",
+            type="primary",
+            use_container_width=True,
+            disabled=checks_ok,
+        ):
+            st.rerun()
+
+        return checks_ok
 
     def get_descr(self):
         return StringExporter(block_id=self.page["id"]).export()
@@ -213,7 +234,6 @@ class Notion:
         ```
         # Job Properties
         Title: Data Science Internship at Example
-        City: Zurich
         ===
         # Job Description
         ## About the job
@@ -221,11 +241,9 @@ class Notion:
         ```
         """
         job_title = self.page["properties"]["Position"]["title"][0]["plain_text"]
-        job_city = self.page["properties"]["City"]["select"]["name"]
         res = "# Job Properties\n"
         res += f"Title: {job_title}\n"
-        res += f"City: {job_city}\n"
-        res += f"My Address: {get_my_address(self.page)}\n\n"
+        res += f"==="
         res += f"# Job Description\n"
         res += self.get_descr()
         return res
@@ -258,6 +276,7 @@ class Notion:
             properties["Company"] = {
                 "rich_text": [{"text": {"content": company[0]["plain_text"]}}]
             }
+        # Deprecated, but kept in case I'll reuse it in the future
         if city := self.page["properties"]["City"]["select"]:
             properties["City"] = {"select": {"name": city["name"]}}
 
