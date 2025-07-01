@@ -69,6 +69,7 @@ class Llm:
             "req_stud": f"Check if the candidate is required to be currently enrolled at the university. {req_explain_prompt}. If required return: '❌ Student status required: ...'. Otherwise: '➡️ Current university student status requirement passed'",
             "req_phd": "Check if a PhD degree is strictly required. If so: '❌ PhD position required'. Otherwise: '➡️ PhD requirement passed'",
             "req_years": f"Check if number of years of experience is specified, and 4 or more years are required. {req_explain_prompt}. If so: '❌ Years of experience required: ...'. Otherwise: '➡️ Years of experience requirement passed'",
+            "req_ml": "Check if this position includes working with statistical models, like machine learning models or AI models. If so: '➡️ Machine Learning included'. Otherwise: '❌ No mentions of Machine Learning'",
             "req_letter": f"Check if the cover letter or motivation letter is required. {req_explain_prompt}. If required return: '✅ Letter required: ...', otherwise '➡️ Letter not required'",
             "req_email": "Check if an email of a recruiter is provided for asking questions regarding the job. Replace ... with the email provided. If provided return: '✅ Email proveded: ...', otherwise '➡️ Email not provided'",
         }
@@ -81,6 +82,7 @@ class Llm:
         │ Student    │ {}
         │ PhD        │ {}
         │ Years      │ {}
+        │ ML         │ {}
         └────────────┴───────────────────────────────────────────────────────────────
 
         ┌────────────────────────────────────────────────────────────────────────────
@@ -90,7 +92,9 @@ class Llm:
         │ Email     │ {}
         └───────────┴────────────────────────────────────────────────────────────────
         """
-        txt_box = st.code(reqs_print.format("...", "...", "...", "...", "...", "..."))
+        txt_box = st.code(
+            reqs_print.format("...", "...", "...", "...", "...", "...", "...")
+        )
 
         def fetch_requirement(req_name, req_desc, page_content):
             return req_name, self._openai_query(
@@ -115,6 +119,7 @@ class Llm:
                 reqs_out["req_stud"],
                 reqs_out["req_phd"],
                 reqs_out["req_years"],
+                reqs_out["req_ml"],
                 reqs_out["req_letter"],
                 reqs_out["req_email"],
             )

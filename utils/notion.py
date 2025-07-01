@@ -17,8 +17,17 @@ class Notion:
         self.db_id = db_id
 
     def _query_db(self, **kwargs):
+        # database_id may be provided to be external
+        if "database_id" not in kwargs:
+            kwargs["database_id"] = self.db_id
+
+        query = self.notion.databases.query(page_size=25, **kwargs)
+        return query
+
+    def _query_external_db(self, database_id, **kwargs):
+        # If
         query = self.notion.databases.query(
-            database_id=self.db_id, page_size=25, **kwargs
+            database_id=database_id, page_size=25, **kwargs
         )
         return query
 
@@ -94,45 +103,58 @@ class Notion:
 
     def check_duplicate_page(self) -> None:
         """
-        Check for other postings with the same URL with and without trailing slash.
-        If dupicate is found, raise ValueError.
+        Check for duplicates of this posting.
+        Posting is a duplicate if:
+        - it has the same URL, or
+        - it has the same title and company
 
-        Example of same URLs:
-            - https://www.linkedin.com/jobs/view/1234567890
-            - https://www.linkedin.com/jobs/view/1234567890/
+        Databases checked are:
+        - current: Jul 2025-Present
+        - 2024 DB: Nov 2024-Feb 2024
         """
-        # LinkedIn URL
-        url = self.page["properties"]["URL"]["url"]
-        assert url, "[Notion] Check failed. URL is empty."
 
-        # Add or remove trailing slash
-        if url[-1] == "/":
-            url_ts = url[:-1]
-        else:
-            url_ts = url + "/"
-        query = self._query_db(
-            filter={
-                "or": [
-                    {"property": "URL", "url": {"equals": url}},
-                    {"property": "URL", "url": {"equals": url_ts}},
-                ]
-            }
-        )
-        # Check if 2 posts have same title and same company
-        title = self.page["properties"]["Position"]["title"][0]["plain_text"]
-        company = self.page["properties"]["Company"]["rich_text"][0]["plain_text"]
-        query = self._query_db(
-            filter={
-                "and": [
-                    {"property": "Position", "title": {"equals": title}},
-                    {"property": "Company", "rich_text": {"equals": company}},
-                ]
-            }
-        )
-        if len(query["results"]) != 1:
-            raise ValueError(
-                f"[Notion] Check failed. Posting has duplicate with same Title '{title}' and Company '{company}'."
+        def _check_page(database_id):
+            # LinkedIn URL
+            url = self.page["properties"]["URL"]["url"]
+            assert url, "[Notion] Check failed. URL is empty."
+
+            # Add or remove trailing slash
+            if url[-1] == "/":
+                url_ts = url[:-1]
+            else:
+                url_ts = url + "/"
+            title = self.page["properties"]["Position"]["title"][0]["plain_text"]
+            company = self.page["properties"]["Company"]["rich_text"][0]["plain_text"]
+            query = self._query_db(
+                filter={
+                    "or": [
+                        {"property": "URL", "url": {"equals": url}},
+                        {"property": "URL", "url": {"equals": url_ts}},
+                        {
+                            "and": [
+                                {"property": "Position", "title": {"equals": title}},
+                                {
+                                    "property": "Company",
+                                    "rich_text": {"equals": company},
+                                },
+                            ]
+                        },
+                    ]
+                },
+                database_id=database_id,
             )
+            return query["results"]
+
+        err_message = "[Notion] Check failed. Posting has duplicate with same Title/Company, or same URL in DB: https://notion.so/{}"
+
+        # Check current DB: Must have 1 page (this page)
+        res_db_curr = _check_page(self.db_id)
+        assert len(res_db_curr) == 1, err_message.format(self.db_id)
+
+        # Check 2024 DB: Must have 0 pages
+        db_id_2024 = "52acad8fd3ac4c9cb9c01472750dbfac"
+        res_db_2024 = _check_page(db_id_2024)
+        assert len(res_db_2024) == 0, err_message.format(db_id_2024)
 
     def check_db_missing_files(self) -> None:
         """Check if DB contains pages which are 'Applied' but contain no documents."""
