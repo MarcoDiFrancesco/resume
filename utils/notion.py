@@ -24,24 +24,16 @@ class Notion:
         query = self.notion.databases.query(page_size=25, **kwargs)
         return query
 
-    # def _query_external_db(self, database_id, **kwargs):
-    #     # If
-    #     query = self.notion.databases.query(
-    #         database_id=database_id, page_size=25, **kwargs
-    #     )
-    #     return query
-
-    # def _query_blocks(self, **kwargs):
-    #     query = self.notion.blocks.children.list(**kwargs)
-    #     return query
-
     def fetch_page_from_db(self):
         """Fetch 'Not Applied' posting.
 
         Priority:
             1. Posting with city specified: since underlining was probably already present
                 - City is deprecated, but kept in case I'll want it in the future
-            2. Oldest posting first
+            2. Newest posting first, grouped by day
+                - When I used to finish up all postings 'Oldest' made sense. When applying
+                  infrequently there is a better chance to apply to newest postings first.
+                  For example, postings above 7 days can be discarded.
             3. Company name: replicating a random choice, but deterministic
         """
         txt_print = """
@@ -63,7 +55,7 @@ class Notion:
             },
             sorts=[
                 {"property": "City", "direction": "ascending"},
-                {"property": "_Day", "direction": "ascending"},
+                {"property": "_Day", "direction": "descending"},
                 {"property": "Company", "direction": "ascending"},
             ],
         )
