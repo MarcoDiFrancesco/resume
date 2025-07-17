@@ -24,12 +24,12 @@ class Notion:
         query = self.notion.databases.query(page_size=25, **kwargs)
         return query
 
-    def _query_external_db(self, database_id, **kwargs):
-        # If
-        query = self.notion.databases.query(
-            database_id=database_id, page_size=25, **kwargs
-        )
-        return query
+    # def _query_external_db(self, database_id, **kwargs):
+    #     # If
+    #     query = self.notion.databases.query(
+    #         database_id=database_id, page_size=25, **kwargs
+    #     )
+    #     return query
 
     # def _query_blocks(self, **kwargs):
     #     query = self.notion.blocks.children.list(**kwargs)
@@ -69,10 +69,10 @@ class Notion:
         )
         if len(query["results"]) == 0:
             txt_box.write(
-                f"⬆️ No new posting 'Non Applied' found. Add new postings to Notion DB."
+                "⬆️ No new posting 'Non Applied' found. Add new postings to Notion DB."
             )
             raise ValueError(
-                f"❌ No new posting 'Non Applied' found. Add new postings to Notion DB."
+                "❌ No new posting 'Non Applied' found. Add new postings to Notion DB."
             )
         else:
             self.page = query["results"][0]
@@ -107,54 +107,40 @@ class Notion:
         Posting is a duplicate if:
         - it has the same URL, or
         - it has the same title and company
-
-        Databases checked are:
-        - current: Jul 2025-Present
-        - 2024 DB: Nov 2024-Feb 2024
         """
 
-        def _check_page(database_id):
-            # LinkedIn URL
-            url = self.page["properties"]["URL"]["url"]
-            assert url, "[Notion] Check failed. URL is empty."
+        # LinkedIn URL
+        url = self.page["properties"]["URL"]["url"]
+        assert url, "[Notion] Check failed. URL is empty."
 
-            # Add or remove trailing slash
-            if url[-1] == "/":
-                url_ts = url[:-1]
-            else:
-                url_ts = url + "/"
-            title = self.page["properties"]["Position"]["title"][0]["plain_text"]
-            company = self.page["properties"]["Company"]["rich_text"][0]["plain_text"]
-            query = self._query_db(
-                filter={
-                    "or": [
-                        {"property": "URL", "url": {"equals": url}},
-                        {"property": "URL", "url": {"equals": url_ts}},
-                        {
-                            "and": [
-                                {"property": "Position", "title": {"equals": title}},
-                                {
-                                    "property": "Company",
-                                    "rich_text": {"equals": company},
-                                },
-                            ]
-                        },
-                    ]
-                },
-                database_id=database_id,
-            )
-            return query["results"]
+        # Add or remove trailing slash
+        if url[-1] == "/":
+            url_ts = url[:-1]
+        else:
+            url_ts = url + "/"
+        title = self.page["properties"]["Position"]["title"][0]["plain_text"]
+        company = self.page["properties"]["Company"]["rich_text"][0]["plain_text"]
+        query = self._query_db(
+            filter={
+                "or": [
+                    {"property": "URL", "url": {"equals": url}},
+                    {"property": "URL", "url": {"equals": url_ts}},
+                    {
+                        "and": [
+                            {"property": "Position", "title": {"equals": title}},
+                            {"property": "Company", "rich_text": {"equals": company}},
+                        ]
+                    },
+                ]
+            },
+        )
 
-        err_message = "[Notion] Check failed. Posting has duplicate with same Title/Company, or same URL in DB: https://notion.so/{}"
-
-        # Check current DB: Must have 1 page (this page)
-        res_db_curr = _check_page(self.db_id)
-        assert len(res_db_curr) == 1, err_message.format(self.db_id)
-
-        # Check 2024 DB: Must have 0 pages
-        db_id_2024 = "52acad8fd3ac4c9cb9c01472750dbfac"
-        res_db_2024 = _check_page(db_id_2024)
-        assert len(res_db_2024) == 0, err_message.format(db_id_2024)
+        if len(query["results"]) != 1:
+            err_str = "❌ **Duplicate found. Posting has duplicate with same Title+Company or same URL:**\n"
+            for page in query["results"]:
+                err_str += f"  - [{page['url']}]({page['url']})\n"
+            st.markdown(err_str)
+            raise ValueError("Duplicate found. Read details above.")
 
     def check_db_missing_files(self) -> None:
         """Check if DB contains pages which are 'Applied' but contain no documents."""
@@ -174,10 +160,11 @@ class Notion:
         )
         # Check if there is more than one page
         if len(query["results"]) != 0:
-            err_str = f"[📂] Notion database check - Check failed. These pages are maked as 'Applied' but have no uploaded document:\n"
+            err_str = "[📂] **No CV attached. These postings are maked as 'Applied' but have no uploaded document:**\n"
             for page in query["results"]:
                 err_str += f"  - {page['url']}\n"
-            raise ValueError(err_str)
+            st.markdown(err_str)
+            raise ValueError("No CV attached. Read details above.")
 
     def check_page_properties(self) -> bool:
         """

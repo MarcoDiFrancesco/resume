@@ -1,6 +1,7 @@
 import concurrent.futures
 import time
 
+import google.generativeai as genai
 import streamlit as st
 from groq import Groq
 from openai import OpenAI
@@ -10,6 +11,7 @@ class Llm:
     def __init__(self):
         self.openai = OpenAI()
         self.groq = Groq()
+        self.gemini = genai.GenerativeModel("gemini-2.5-flash")
 
     def _openai_query(self, model: str, query: str, data: str) -> list:
         """Simple LLM query.
@@ -21,7 +23,8 @@ class Llm:
         """
         response = self.openai.chat.completions.create(
             model=model,
-            temperature=0,
+            # Temperature not supported on o3-like models
+            # temperature=0,
             messages=[
                 {
                     "role": "system",
@@ -35,6 +38,12 @@ class Llm:
         )
         resp = response.choices[0].message.content
         return resp
+
+    def _gemini_query(self, query: str, data: str) -> str:
+        """Simple Gemini query."""
+        prompt = f"{query}\n\n###\n\n{data}"
+        response = self.gemini.generate_content(prompt)
+        return response.text
 
     def _groq_query(self, model: str, query: str, data: str) -> str:
         chat_completion = self.groq.chat.completions.create(
@@ -65,13 +74,19 @@ class Llm:
         )
         # Requirements
         reqs_prompt = {
-            "req_lang": f"Check if one or more non-English languages are strictly required for this job. {req_explain_prompt}. If so: '❌ Language: ...'. Otherwise: '➡️ Language requirement passed'",
+            "req_lang": f"Check if there are non-English languages which are STRICTLY required. {req_explain_prompt}. If so: '❌ Language: ...'. Otherwise: '➡️ Language requirement passed'",
             "req_stud": f"Check if the candidate is required to be currently enrolled at the university. {req_explain_prompt}. If required return: '❌ Student status required: ...'. Otherwise: '➡️ Current university student status requirement passed'",
             "req_phd": "Check if a PhD degree is strictly required. If so: '❌ PhD position required'. Otherwise: '➡️ PhD requirement passed'",
-            "req_years": f"Check if number of years of experience is specified, and 4 or more years are required. {req_explain_prompt}. If so: '❌ Years of experience required: ...'. Otherwise: '➡️ Years of experience requirement passed'",
-            "req_ml": "Check if this position includes working with statistical models, like machine learning models or AI models. If so: '➡️ Machine Learning included'. Otherwise: '❌ No mentions of Machine Learning'",
+            "req_years": f"""
+                Check if 4+ years of experience are required.
+                {req_explain_prompt}
+                If required:     '❌ Years of experience required: ...'
+                For example:     '❌ Years of experience required: 5 years in Devops, 4 in ML'
+                If not required: '➡️ Years of experience requirement passed'
+            """,
+            "req_ml": "Check if this position includes working with statistical models, like training or deploying machine learning models or AI models. If so: '➡️ Machine Learning included'. Otherwise: '❌ No mentions of Machine Learning'",
             "req_letter": f"Check if the cover letter or motivation letter is required. {req_explain_prompt}. If required return: '✅ Letter required: ...', otherwise '➡️ Letter not required'",
-            "req_email": "Check if an email of a recruiter is provided for asking questions regarding the job. Replace ... with the email provided. If provided return: '✅ Email proveded: ...', otherwise '➡️ Email not provided'",
+            "req_email": "Check if an email of a recruiter is provided for asking questions regarding the position. Replace ... with the email provided. If provided return: '✅ Email proveded: ...', otherwise '➡️ Email not provided'",
         }
         reqs_out = {}
         reqs_print = """
@@ -86,20 +101,20 @@ class Llm:
         └────────────┴───────────────────────────────────────────────────────────────
 
         ┌────────────────────────────────────────────────────────────────────────────
-        │ Extra attachments
+        │ Attachments
         ├───────────┬────────────────────────────────────────────────────────────────
         │ Letter    │ {}
         │ Email     │ {}
         └───────────┴────────────────────────────────────────────────────────────────
         """
         txt_box = st.code(
-            reqs_print.format("...", "...", "...", "...", "...", "...", "...")
+            reqs_print.format("...", "...", "...", "...", "...", "...", "..."),
+            language="plaintext",
         )
 
         def fetch_requirement(req_name, req_desc, page_content):
-            return req_name, self._openai_query(
-                "gpt-4o-2024-11-20", req_desc, page_content
-            )
+            # gpt-4.1-mini
+            return req_name, self._gemini_query(req_desc, page_content)
 
         # Make LLM requests in parallel
         with concurrent.futures.ThreadPoolExecutor() as executor:

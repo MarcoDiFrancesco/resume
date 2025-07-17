@@ -10,7 +10,7 @@ from aider.models import Model
 
 from utils.utils import files_exist
 
-INSTRUCTIONS = rf"""
+INSTRUCTIONS = r"""
 Intrustions:
 - For every change you do the tone must remain modest, factual, and free from buzzwords and corporate jargon. Never use adjectives or superlative words like: 'best', 'complex', 'strong', 'leveraging', 'seamless' etc.
 - Do not ask me 'Run shell command?', or any other command.
@@ -32,7 +32,7 @@ In section 'Work Experience':
 - Rank the points by relevance for this job posting.
 """
 
-PROMPT_RESUME_TECH = rf"""
+PROMPT_RESUME_TECH = r"""
 (Prompt Resume 2 - v8)
 
 In section 'Relevant Technologies', for each section:
@@ -41,7 +41,7 @@ In section 'Relevant Technologies', for each section:
 """
 
 
-PROMPT_RESUME_PROJ = rf"""
+PROMPT_RESUME_PROJ = r"""
 (Prompt Resume 3 - v8)
 
 In section 'Extra Projects':
@@ -50,7 +50,7 @@ In section 'Extra Projects':
 - Do not change name or description.
 """
 
-PROMPT_RESUME_ADD_KEYWORDS = rf"""
+PROMPT_RESUME_ADD_KEYWORDS = r"""
 (Prompt Resume 4 - v8)
 
 In section 'Additional Keywords':
@@ -85,7 +85,7 @@ Rewrite the EMAIL_DRAFT.md to fit the JOB_DESCRIPTION.md. Rewrite the 2 question
 
 class Aider:
     def __init__(self):
-        self.model = Model("sonnet")
+        self.model = Model("gemini-2.5-pro")
 
     def _reset(self):
         self.coder: Coder = Coder.create(main_model=self.model, auto_commits=False)
