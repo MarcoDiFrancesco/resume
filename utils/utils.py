@@ -8,6 +8,16 @@ import dateutil.parser
 import streamlit as st
 from git import Repo
 
+RESUME_FILES = [
+    "cv/1-summary.tex",
+    "cv/2-experience.tex",
+    "cv/3-education.tex",
+    "cv/4-technologies.tex",
+    "cv/5-keywords.tex",
+    "cv/6-projects.tex",
+    # "cv/7-extracurricular.tex",
+]
+
 
 def files_exist(fnames):
     """Check if all input files are present."""
@@ -31,7 +41,7 @@ def copy_text_to_file(text: str, fname: str):
         file.write(text)
 
 
-def reset_git_changes(fname):
+def reset_git_changes(fnames):
     """
     Check if file has git changes.
     For example if 'resume.tex' is not template, reset it to template.
@@ -42,7 +52,8 @@ def reset_git_changes(fname):
     assert not repo.head.is_detached, "Go to HEAD state: 'git switch master'"
 
     changed_files = [item.a_path for item in repo.index.diff(None)]
-    if fname in changed_files:
-        # Reset git changes. Only unstaged changes are reset.
-        repo.git.checkout("--", fname)
-        st.text(f"[📌] Git changes in '{fname}' were reset.")
+    for fname in fnames:
+        if fname in changed_files:
+            # Reset git changes. Only unstaged changes are reset.
+            repo.git.checkout("--", fname)
+            st.text(f"[📌] Git changes in '{fname}' were reset.")

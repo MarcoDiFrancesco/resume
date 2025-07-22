@@ -6,6 +6,7 @@ from utils.aider import Aider
 from utils.llm import Llm
 from utils.notion import Notion
 from utils.utils import (
+    RESUME_FILES,
     copy_text_to_file,
     files_exist,
     page_is_underlined,
@@ -86,18 +87,18 @@ def update_files(notion: Notion):
     }
     if st.button("1️⃣ Update Resume", **button_kwargs):
         with st.status("Resume", expanded=True):
-            reset_git_changes("resume.tex")
+            reset_git_changes(RESUME_FILES)
             aider.update_resume()
             notion.set_applied_and_date()
 
     if st.button("2️⃣ Update Cover letter", **button_kwargs):
         with st.status("Cover letter", expanded=True):
-            reset_git_changes("coverletter.tex")
+            reset_git_changes(["coverletter.tex"])
             aider.update_cover_letter()
 
     if st.button("3️⃣ Update Email", **button_kwargs):
         with st.status("Email", expanded=True):
-            reset_git_changes("EMAIL_DRAFT.md")
+            reset_git_changes(["EMAIL_DRAFT.md"])
             aider.update_email()
 
 
