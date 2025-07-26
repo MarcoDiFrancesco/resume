@@ -132,8 +132,8 @@ class Aider:
         self._prompt(PROMPT_RESUME_SUMMARY, "Resume", 1, 5)
         self._prompt(PROMPT_RESUME_WORK, "Resume", 2, 5)
         self._prompt(PROMPT_RESUME_TECH, "Resume", 3, 5)
-        self._prompt(PROMPT_RESUME_PROJ, "Resume", 4, 5)
         self._prompt(PROMPT_RESUME_KEYWORDS, "Resume", 5, 5)
+        self._prompt(PROMPT_RESUME_PROJ, "Resume", 4, 5)
 
     def update_cover_letter(self):
         """
