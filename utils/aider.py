@@ -51,7 +51,7 @@ PROMPT_RESUME_KEYWORDS = rf"""
 (Prompt Resume 5 - v9)
 
 In section 'Keywords':
-- Gather all the keywords missing from the resume.tex but present in JOB_DESCRIPTION.md, that would improve the resume score of an ATS keyword scanner.
+- Gather all the keywords missing from the resume files, but present in JOB_DESCRIPTION.md, that would improve the resume score of an ATS keyword scanner.
 - Include 10 to 20 of them.
 """
 
@@ -69,7 +69,7 @@ PROMPT_LETTER = rf"""
 {INSTRUCTIONS}
 (Prompt Cover Letter - v9)
 
-Update the cover letter (in coverletter.tex) to match the requirements of a new job description (in JOB_DESCRIPTION.md) for the job posting new company, considering the resume (in resume.tex).
+Update the cover letter (in coverletter.tex) to match the requirements of a new job description (in JOB_DESCRIPTION.md) for the job posting new company, considering the resume.
 In each of the 3 sections pick up muliple points brought up from the job description and resume.
 
 Instructions:
@@ -91,59 +91,62 @@ Rewrite the EMAIL_DRAFT.md to fit the JOB_DESCRIPTION.md. Rewrite the 2 question
 """
 
 
-class Aider:
-    def __init__(self):
-        self.model = Model("gemini-2.5-pro")
+def _get_coder(fnames: list) -> Coder:
+    """Create Aider Coder with specified files.
 
-    def _reset(self):
-        """Reset Aider coder"""
-        self.coder: Coder = Coder.create(main_model=self.model, auto_commits=False)
+    Args:
+        fnames (list): Files the Coder can view and interact with
+    """
+    model = Model("gemini-2.5-pro")
+    coder = Coder.create(main_model=model, auto_commits=False)
+    # Check for file existance
+    files_exist(fnames)
+    for fname in fnames:
+        coder.add_rel_fname(fname)
+    return coder
 
-    def _add_files(self, fnames):
-        files_exist(fnames)
-        for fname in fnames:
-            self.coder.add_rel_fname(fname)
 
-    def _prompt(self, prompt, file, num, tot):
-        """Run Aider command and show progress in the dashboard as a text box."""
-        txt_box = st.text(f"[Aider] - {file} prompt {num}/{tot}. Running...")
-        start = time.time()
+def _prompt(prompt, prompt_name, files):
+    """Run Aider command and show progress in the dashboard as a text box."""
+    coder = _get_coder(files)
+    txt_box = st.text(f"[Aider] - {prompt_name} prompt. Running...")
+    start = time.time()
 
-        # Capture output from self.coder.run(prompt)
-        captured_output = io.StringIO()
-        sys.stdout = captured_output
-        self.coder.run(prompt)
-        sys.stdout = sys.__stdout__
-        result = captured_output.getvalue()
-        # Remove aider line coloring escape sequences
-        result = re.sub(r"\x1b\[[0-9;]*m", "", result)
-        st.code(result)
-        end = time.time()
-        txt_box.text(
-            f"[Aider] - {file} prompt {num}/{tot}. Done in {end-start:.0f} sec. Session cost: {self.coder.total_cost:.2f}$"
-        )
+    # Capture output from coder.run(prompt)
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+    coder.run(prompt)
+    sys.stdout = sys.__stdout__
+    result = captured_output.getvalue()
+    # Remove aider line coloring escape sequences
+    result = re.sub(r"\x1b\[[0-9;]*m", "", result)
+    st.code(result)
+    end = time.time()
+    txt_box.text(
+        f"[Aider] - {prompt_name} prompt. Done in {end-start:.0f} sec. Session cost: {coder.total_cost:.2f}$"
+    )
 
-    def update_resume(self):
-        """
-        Update resume.tex with Aider to match the job description.
-        """
-        self._reset()
-        self._add_files(["JOB_DESCRIPTION.md", *RESUME_FILES])
-        self._prompt(PROMPT_RESUME_SUMMARY, "Resume", 1, 5)
-        self._prompt(PROMPT_RESUME_WORK, "Resume", 2, 5)
-        self._prompt(PROMPT_RESUME_TECH, "Resume", 3, 5)
-        self._prompt(PROMPT_RESUME_KEYWORDS, "Resume", 5, 5)
-        self._prompt(PROMPT_RESUME_PROJ, "Resume", 4, 5)
 
-    def update_cover_letter(self):
-        """
-        Update coverletter.tex with Aider.
-        """
-        self._reset()
-        self._add_files(["JOB_DESCRIPTION.md", *RESUME_FILES, "coverletter.tex"])
-        self._prompt(PROMPT_LETTER, "Cover Letter", 1, 1)
+def update_resume():
+    """
+    Update resume files with Aider to match the job description.
+    """
+    files = ["JOB_DESCRIPTION.md", *RESUME_FILES]
+    _prompt(PROMPT_RESUME_SUMMARY, "Summary", files)
+    _prompt(PROMPT_RESUME_WORK, "Work", files)
+    _prompt(PROMPT_RESUME_TECH, "Technologies", files)
+    _prompt(PROMPT_RESUME_KEYWORDS, "Keywords", files)
+    _prompt(PROMPT_RESUME_PROJ, "Projects", files)
 
-    def update_email(self):
-        self._reset()
-        self._add_files(["JOB_DESCRIPTION.md", *RESUME_FILES, "EMAIL_DRAFT.md"])
-        self._prompt(PROMPT_EMAIL, "Email", 1, 1)
+
+def update_cover_letter():
+    """
+    Update cover letter with Aider to match the job description.
+    """
+    files = ["JOB_DESCRIPTION.md", *RESUME_FILES, "coverletter.tex"]
+    _prompt(PROMPT_LETTER, "Cover Letter", files)
+
+
+def update_email():
+    files = ["JOB_DESCRIPTION.md", *RESUME_FILES, "EMAIL_DRAFT.md"]
+    _prompt(PROMPT_EMAIL, "Email", files)

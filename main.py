@@ -2,7 +2,7 @@ import os
 
 import streamlit as st
 
-from utils.aider import Aider
+from utils import aider
 from utils.llm import Llm
 from utils.notion import Notion
 from utils.utils import (
@@ -71,7 +71,6 @@ def browser_buttons(notion):
 
 
 def update_files(notion: Notion):
-    aider = Aider()
     check_pass = notion.check_page_properties()
 
     st.subheader("Finetune")
