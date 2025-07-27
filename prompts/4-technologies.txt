@@ -1,0 +1,8 @@
+Intrustions:
+- For every change you do the tone must remain modest, factual, and free from buzzwords and corporate jargon. Never use adjectives or superlative words like: 'best', 'complex', 'strong', 'leveraging', 'seamless' etc.
+- JOB_DESCRIPTION.md highlights the skills in ***bold italic***. Reflect only these skills, or those already mentioned in the resume. If a skill in the JOB_DESCRIPTION.md is not in ***bold italic*** do NOT mention it.
+- Do not ask me to run any command, such as 'Run shell command?', or 'Add file to the chat?'.
+
+In section 'Relevant Technologies', for each section:
+- Write the technologies specified in 'Always show', plus add the relevant technologies in 'Optional', plus the relevant technologies in ***bold italic*** in the JOB_DESCRIPTION.md. From the JOB_DESCRIPTION.md do NOT add technologies if they are not underlined in ***bold italic***.
+- Rank them by relevance for this job posting, starting with the most important.
