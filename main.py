@@ -85,10 +85,11 @@ def update_files(notion: Notion):
         "use_container_width": True,
     }
     if st.button("1️⃣ Update Resume", **button_kwargs):
-        with st.status("Resume", expanded=True):
-            reset_git_changes(RESUME_FILES)
-            aider.update_resume()
-            notion.set_applied_and_date()
+        # Removed, since expanders can't be nested inside expanders
+        # with st.status("Resume", expanded=True):
+        reset_git_changes(RESUME_FILES)
+        aider.update_resume()
+        notion.set_applied_and_date()
 
     if st.button("2️⃣ Update Cover letter", **button_kwargs):
         with st.status("Cover letter", expanded=True):

@@ -1,11 +1,12 @@
-import io
+import concurrent.futures
 import os
-import re
-import sys
 import time
+from contextlib import redirect_stdout
+from time import sleep
 
 import streamlit as st
 from aider.coders import Coder
+from aider.io import InputOutput
 from aider.models import Model
 
 from utils.utils import RESUME_FILES, files_exist
@@ -98,7 +99,9 @@ def _get_coder(fnames: list) -> Coder:
         fnames (list): Files the Coder can view and interact with
     """
     model = Model("gemini-2.5-pro")
+    # model = Model("gemini-2.5-flash-lite")
     coder = Coder.create(main_model=model, auto_commits=False)
+
     # Check for file existance
     files_exist(fnames)
     for fname in fnames:
@@ -107,24 +110,15 @@ def _get_coder(fnames: list) -> Coder:
 
 
 def _prompt(prompt, prompt_name, files):
-    """Run Aider command and show progress in the dashboard as a text box."""
+    """Run Aider command and return the result and status."""
     coder = _get_coder(files)
-    txt_box = st.text(f"[Aider] - {prompt_name} prompt. Running...")
     start = time.time()
 
-    # Capture output from coder.run(prompt)
-    captured_output = io.StringIO()
-    sys.stdout = captured_output
-    coder.run(prompt)
-    sys.stdout = sys.__stdout__
-    result = captured_output.getvalue()
-    # Remove aider line coloring escape sequences
-    result = re.sub(r"\x1b\[[0-9;]*m", "", result)
-    st.code(result)
-    end = time.time()
-    txt_box.text(
-        f"[Aider] - {prompt_name} prompt. Done in {end-start:.0f} sec. Session cost: {coder.total_cost:.2f}$"
-    )
+    aider_output = coder.run(prompt)
+    code = f"{prompt}\n\n---\n\n{aider_output}"
+    exec_time = time.time() - start
+    cost = coder.total_cost
+    return prompt_name, code, exec_time, cost
 
 
 def update_resume():
@@ -132,11 +126,35 @@ def update_resume():
     Update resume files with Aider to match the job description.
     """
     files = ["JOB_DESCRIPTION.md", *RESUME_FILES]
-    _prompt(PROMPT_RESUME_SUMMARY, "Summary", files)
-    _prompt(PROMPT_RESUME_WORK, "Work", files)
-    _prompt(PROMPT_RESUME_TECH, "Technologies", files)
-    _prompt(PROMPT_RESUME_KEYWORDS, "Keywords", files)
-    _prompt(PROMPT_RESUME_PROJ, "Projects", files)
+    prompts = [
+        (PROMPT_RESUME_SUMMARY, "Summary", files),
+        (PROMPT_RESUME_WORK, "Work", files),
+        (PROMPT_RESUME_TECH, "Technologies", files),
+        (PROMPT_RESUME_KEYWORDS, "Keywords", files),
+        (PROMPT_RESUME_PROJ, "Projects", files),
+    ]
+
+    placeholders = {}
+    for _, prompt_name, _ in prompts:
+        placeholder = st.empty()
+        expander = placeholder.expander(f"▷ {prompt_name}: Running...")
+        expander.code("Processing...")
+        placeholders[prompt_name] = placeholder
+
+    # Discard output from coder.run(prompt)
+    with open(os.devnull, "w") as devnull:
+        with redirect_stdout(devnull):
+            # Parallel execution
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = [executor.submit(_prompt, *p) for p in prompts]
+                for future in concurrent.futures.as_completed(futures):
+                    prompt_name, code_output, exec_time, cost = future.result()
+                    status = f"✅ {prompt_name}: Done in {exec_time:.0f}s (${cost:.2f})"
+
+                    placeholder = placeholders[prompt_name]
+                    placeholder.empty()
+                    with placeholder.expander(status):
+                        st.code(code_output)
 
 
 def update_cover_letter():

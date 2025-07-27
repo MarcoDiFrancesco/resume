@@ -10,7 +10,7 @@ from git import Repo
 
 RESUME_FILES = [
     "cv/1-summary.tex",
-    "cv/2-experience.tex",
+    "cv/2-work.tex",
     "cv/3-education.tex",
     "cv/4-technologies.tex",
     "cv/5-keywords.tex",
