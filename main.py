@@ -55,7 +55,9 @@ def fetch_posting():
             notion.page = notion_page_new
         else:
             txt_box.markdown(
-                "📂 [Notion page]({}) (unchanged)".format(notion.page["url"])
+                "📂 [Notion page]({}) (text in bold italic found, left unchanged)".format(
+                    notion.page["url"]
+                )
             )
     return notion
 

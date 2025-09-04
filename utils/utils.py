@@ -16,6 +16,7 @@ RESUME_FILES = [
     "cv/5-keywords.tex",
     "cv/6-projects.tex",
     # "cv/7-extracurricular.tex",
+    "header.tex",
 ]
 
 

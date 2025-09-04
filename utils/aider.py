@@ -12,23 +12,6 @@ from aider.models import Model
 
 from utils.utils import RESUME_FILES, files_exist
 
-PROMPT_LETTER = rf"""
-ADD INSTRUCTIONS...
-
-(Prompt Cover Letter - v9)
-
-Update the cover letter (in coverletter.tex) to match the requirements of a new job description (in JOB_DESCRIPTION.md) for the job posting new company, considering the resume.
-In each of the 3 sections pick up muliple points brought up from the job description and resume.
-
-Instructions:
-- Do not mention anywhere the Nature publication.
-- Do not change the word choice and tone.
-
-Specific to 'Why Company' section:
-- Keep the reason that I want to change from a large corporation to a smaller company.
-- Replace 'COMPANY-NAME' with the company name from the job description.
-"""
-
 PROMPT_EMAIL = rf"""
 ADD INSTRUCTIONS...
 
@@ -66,10 +49,9 @@ def update_resume():
     input_files = ["JOB_DESCRIPTION.md", *RESUME_FILES]
     prompts = [
         ("prompts/1-summary.txt", "Summary"),
-        ("prompts/2-work.txt", "Work"),
         ("prompts/4-technologies.txt", "Technologies"),
         ("prompts/5-keywords.txt", "Keywords"),
-        ("prompts/6-projects.txt", "Projects"),
+        ("prompts/7-header.txt", "Header"),
     ]
     placeholders = {}
     for _, prompt_name in prompts:
@@ -96,7 +78,7 @@ def update_cover_letter():
     Update cover letter with Aider to match the job description.
     """
     files = ["JOB_DESCRIPTION.md", *RESUME_FILES, "coverletter.tex"]
-    _prompt(PROMPT_LETTER, "Cover Letter", files)
+    # _prompt(PROMPT_LETTER, "Cover Letter", files)
     raise NotImplementedError()
 
 

@@ -111,7 +111,8 @@ class Notion:
         else:
             url_ts = url + "/"
         title = self.page["properties"]["Position"]["title"][0]["plain_text"]
-        company = self.page["properties"]["Company"]["rich_text"][0]["plain_text"]
+        company = self.page["properties"]["Company"]["rich_text"]
+        company_str = company[0]["plain_text"] if company else "COMPANY NOT SET"
         query = self._query_db(
             filter={
                 "or": [
@@ -120,7 +121,10 @@ class Notion:
                     {
                         "and": [
                             {"property": "Position", "title": {"equals": title}},
-                            {"property": "Company", "rich_text": {"equals": company}},
+                            {
+                                "property": "Company",
+                                "rich_text": {"equals": company_str},
+                            },
                         ]
                     },
                 ]
@@ -234,7 +238,8 @@ class Notion:
         Example:
         ```
         # Job Properties
-        Title: Data Science Internship at Example
+        Title: Data Science Internship at Google
+        Compnay: Google
         ===
         # Job Description
         ## About the job
@@ -242,8 +247,10 @@ class Notion:
         ```
         """
         job_title = self.page["properties"]["Position"]["title"][0]["plain_text"]
+        job_company = self.page["properties"]["Company"]["rich_text"][0]["plain_text"]
         res = "# Job Properties\n"
         res += f"Title: {job_title}\n"
+        res += f"Company: {job_company}\n"
         res += f"==="
         res += f"# Job Description\n"
         res += self.get_descr()
