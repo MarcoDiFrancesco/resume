@@ -2,7 +2,9 @@ Intrustions:
 - For every change you do the tone must remain modest, factual, and free from buzzwords and corporate jargon. Never use adjectives or superlative words like: 'best', 'complex', 'strong', 'leveraging', 'seamless' etc.
 - JOB_DESCRIPTION.md highlights the skills in ***bold italic***. Reflect only these skills, or those already mentioned in the resume. If a skill in the JOB_DESCRIPTION.md is not in ***bold italic*** do NOT mention it.
 - Do not ask me to run any command, such as 'Run shell command?', or 'Add file to the chat?'.
-- Do not edit anything outside the sections specified below.
+- DO NOT edit anything outside the section specified below.
 
-In section 'Work Experience':
-- Rank the bullet points by relevance for this job posting.
+In 'header.tex' specify the company I am applying for in the "\quote". This information is in 'JOB_DESCRIPTION.md'. For example if I'm applying to "SIB Swiss Institute of Bioinformatics", the following
+    \quote{Applying for \textbf{Google}}
+becomes
+    \quote{Applying for \textbf{SIB Swiss Institute of Bioinformatics}}
