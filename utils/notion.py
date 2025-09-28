@@ -24,6 +24,18 @@ class Notion:
         query = self.notion.databases.query(page_size=25, **kwargs)
         return query
 
+    def get_all_pages(self):
+        """Fetch the first 25 pages from the database."""
+        query = self._query_db(
+            filter={
+                "and": [
+                    {"property": "Stage", "select": {"equals": "Not Applied"}},
+                    {"property": "Unsolicited", "checkbox": {"equals": False}},
+                ]
+            },
+        )
+        return query["results"]
+
     def fetch_page_from_db(self):
         """Fetch 'Not Applied' posting.
 
@@ -72,6 +84,8 @@ class Notion:
                 tzinfo=datetime.timezone.utc
             )
             # Notion page age
+            # TODO: set the page age to resetting at midnight, e.g. adding post at 22:00,
+            #       the following day seeting at 10:00 it's anyway 1 day old
             time_delta = datetime.datetime.now(datetime.timezone.utc) - notion_page_time
             title = "".join(
                 self.page["properties"]["Position"]["title"][0]["plain_text"]

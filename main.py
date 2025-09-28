@@ -2,20 +2,17 @@ import os
 
 import streamlit as st
 
-from utils import aider
-from utils.llm import Llm
+from utils import aider, posting
 from utils.notion import Notion
 from utils.utils import (
     RESUME_FILES,
     copy_text_to_file,
-    files_exist,
-    page_is_underlined,
     reset_git_changes,
 )
 
 
 def db_buttons():
-    col1, col2, _ = st.columns(3)
+    col1, col2, col3 = st.columns(3)
     with col1:
         # Button to open Notion database
         st.link_button(
@@ -25,41 +22,17 @@ def db_buttons():
             use_container_width=True,
         )
     with col2:
-        if st.button("🔄 New posting"):
-            fetch_posting.clear()
-
-
-@st.cache_resource
-def fetch_posting():
-    notion = Notion(os.environ["NOTION_DB_ID"])
-    llm = Llm()
-
-    files_exist(["resume.tex"])
-    notion.check_db_missing_files()
-    notion.fetch_page_from_db()
-    notion.check_duplicate_page()
-    page_descr = notion.get_descr()
-    llm.fetch_requirements(page_descr)
-
-    with st.expander("Markdown fix with LLM", icon="🗣️"):
-        txt_print = "📂 [Old Notion page]({}) → 📂 [New Notion page]({})"
-        txt_box = st.markdown(txt_print.format(notion.page["url"], "..."))
-        # Skip LLM rewrite if page was already underlined by me
-        if not page_is_underlined(page_descr):
-            page_descr = llm.query_page_descr(page_descr)
-            notion_page_new = notion.new_page(page_descr)
-            txt_box.markdown(
-                txt_print.format(notion.page["url"], notion_page_new["url"])
-            )
-            notion.delete_page()
-            notion.page = notion_page_new
-        else:
-            txt_box.markdown(
-                "📂 [Notion page]({}) (text in bold italic found, left unchanged)".format(
-                    notion.page["url"]
-                )
-            )
-    return notion
+        if st.button(
+            "🔄 New posting",
+            use_container_width=True,
+        ):
+            posting.fetch_posting.clear()
+    with col3:
+        if st.button(
+            "🪥 Clean Markdown pages",
+            use_container_width=True,
+        ):
+            posting.clean_all_pages_md()
 
 
 def browser_buttons(notion):
@@ -72,7 +45,7 @@ def browser_buttons(notion):
         st.link_button("🟦 LinkedIn", linkedin_url, use_container_width=True)
 
 
-def update_files(notion: Notion):
+def update_buttons(notion: Notion):
     check_pass = notion.check_page_properties()
 
     st.subheader("Finetune")
@@ -111,12 +84,13 @@ def main():
     with c1:
         st.header("Posting")
         db_buttons()
-        notion = fetch_posting()
+        notion = posting.fetch_posting()
     # Right column for updating CV
     with c2:
         st.header("Update CV/Cover Letter")
         browser_buttons(notion)
-        update_files(notion)
+        update_buttons(notion)
+        st.warning("Check Miro for new project setup!")
 
 
 if __name__ == "__main__":

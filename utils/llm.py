@@ -1,5 +1,4 @@
 import concurrent.futures
-import time
 
 import google.generativeai as genai
 import streamlit as st
@@ -142,7 +141,6 @@ class Llm:
 
     def query_page_descr(self, page_descr: str) -> str:
         """Fix markdown syntax with LLM."""
-        time_start = time.time()
         page_descr_new = self._groq_query(
             "llama-3.3-70b-versatile",
             r"""
@@ -157,12 +155,4 @@ class Llm:
             """,
             page_descr,
         )
-        st.text(f"⏱️ Time execution query: {time.time() - time_start:.1f} sec")
-        c1, c2 = st.columns([1, 1])
-        with c1:
-            st.text("📝 Old description")
-            st.code(page_descr, wrap_lines=True)
-        with c2:
-            st.text("📝 New description")
-            st.code(page_descr_new, wrap_lines=True)
         return page_descr_new

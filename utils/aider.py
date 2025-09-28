@@ -1,14 +1,8 @@
 import concurrent.futures
-import os
 import subprocess
 import time
-from contextlib import redirect_stdout
-from time import sleep
 
 import streamlit as st
-from aider.coders import Coder
-from aider.io import InputOutput
-from aider.models import Model
 
 from utils.utils import RESUME_FILES, files_exist
 
