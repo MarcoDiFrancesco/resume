@@ -12,8 +12,16 @@ from utils.utils import (
 
 
 def db_buttons():
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
+        # Button to open Notion database
+        st.link_button(
+            "🍃 Finding My Purpose",
+            f"https://www.notion.so/marcodifrancesco/Finding-My-Purpose-2d0187d9db644cf18cf303c39de09203",
+            type="primary",
+            use_container_width=True,
+        )
+    with col2:
         # Button to open Notion database
         st.link_button(
             "📂 Notion DB",
@@ -21,18 +29,26 @@ def db_buttons():
             type="primary",
             use_container_width=True,
         )
-    with col2:
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
         if st.button(
             "🔄 New posting",
             use_container_width=True,
         ):
             posting.fetch_posting.clear()
-    with col3:
+    with col2:
         if st.button(
             "🪥 Clean Markdown pages",
             use_container_width=True,
         ):
             posting.clean_all_pages_md()
+    with col3:
+        if st.button(
+            "⿻ Find Duplicates",
+            use_container_width=True,
+        ):
+            posting.find_all_duplicates()
 
 
 def browser_buttons(notion):

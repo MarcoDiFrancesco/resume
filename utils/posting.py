@@ -70,3 +70,23 @@ def clean_all_pages_md():
             notion.delete_page()
         progress_bar.progress((i + 1) / len(pages))
     st.success("All pages have been processed.")
+
+
+def find_all_duplicates():
+    """Find duplicates for all 'Not Applied' pages in the Notion database."""
+    notion = Notion(os.environ["NOTION_DB_ID"])
+
+    pages = notion.get_all_pages()
+    st.info(f"Found {len(pages)} pages to check for duplicates.")
+    progress_bar = st.progress(0)
+
+    for i, page in enumerate(pages):
+        notion.page = page
+        try:
+            notion.check_duplicate_page()
+        except ValueError:
+            # Error is already displayed by check_duplicate_page
+            st.error(f"Duplicate check failed for a page. See details above.")
+            return
+        progress_bar.progress((i + 1) / len(pages))
+    st.success("No duplicates found among 'Not Applied' pages.")
