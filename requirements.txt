@@ -7,3 +7,4 @@ groq==0.15.0
 md2notionpage==0.1.5
 streamlit==1.42.0
 pre-commit==4.1.0
+pytest==8.3.4
