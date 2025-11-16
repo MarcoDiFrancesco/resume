@@ -8,6 +8,7 @@ from md2notionpage import core
 from notion2md.exporter.block import StringExporter
 from notion_client import Client
 
+from config import NOTION_PAGE_SIZE
 from utils.utils import page_is_underlined
 
 
@@ -21,7 +22,7 @@ class Notion:
         if "database_id" not in kwargs:
             kwargs["database_id"] = self.db_id
 
-        query = self.notion.databases.query(page_size=25, **kwargs)
+        query = self.notion.databases.query(page_size=NOTION_PAGE_SIZE, **kwargs)
         return query
 
     def get_all_pages(self):

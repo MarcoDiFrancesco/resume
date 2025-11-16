@@ -2,6 +2,7 @@ import os
 
 import streamlit as st
 
+from config import RESUME_MAIN_FILE
 from utils.llm import Llm
 from utils.notion import Notion
 from utils.utils import (
@@ -15,7 +16,7 @@ def fetch_posting():
     notion = Notion(os.environ["NOTION_DB_ID"])
     llm = Llm()
 
-    files_exist(["resume.tex"])
+    files_exist([RESUME_MAIN_FILE])
     notion.check_db_missing_files()
     notion.fetch_page_from_db()
     notion.check_duplicate_page()

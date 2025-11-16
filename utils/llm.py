@@ -5,12 +5,14 @@ import streamlit as st
 from groq import Groq
 from openai import OpenAI
 
+from config import GEMINI_FLASH_MODEL, LLAMA_MODEL
+
 
 class Llm:
     def __init__(self):
         self.openai = OpenAI()
         self.groq = Groq()
-        self.gemini = genai.GenerativeModel("gemini-2.5-flash")
+        self.gemini = genai.GenerativeModel(GEMINI_FLASH_MODEL)
 
     def _openai_query(self, model: str, query: str, data: str) -> list:
         """Simple LLM query.
@@ -142,7 +144,7 @@ class Llm:
     def query_page_descr(self, page_descr: str) -> str:
         """Fix markdown syntax with LLM."""
         page_descr_new = self._groq_query(
-            "llama-3.3-70b-versatile",
+            LLAMA_MODEL,
             r"""
             Check if the markdown syntax is correct. If not, fix it.
             Remove all **bold** and *italic* formatting.

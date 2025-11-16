@@ -8,17 +8,6 @@ import dateutil.parser
 import streamlit as st
 from git import Repo
 
-RESUME_FILES = [
-    "cv/1-summary.tex",
-    "cv/2-work.tex",
-    "cv/3-education.tex",
-    "cv/4-technologies.tex",
-    "cv/5-keywords.tex",
-    "cv/6-projects.tex",
-    # "cv/7-extracurricular.tex",
-    "header.tex",
-]
-
 
 def files_exist(fnames):
     """Check if all input files are present."""

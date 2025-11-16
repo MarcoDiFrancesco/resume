@@ -4,7 +4,19 @@ import time
 
 import streamlit as st
 
-from utils.utils import RESUME_FILES, files_exist
+from config import (
+    AIDER_MODEL,
+    AIDER_SCRIPT_PATH,
+    COVER_LETTER_FILE,
+    EMAIL_DRAFT_FILE,
+    JOB_DESCRIPTION_FILE,
+    PROMPT_HEADER,
+    PROMPT_KEYWORDS,
+    PROMPT_SUMMARY,
+    PROMPT_TECHNOLOGIES,
+    RESUME_FILES,
+)
+from utils.utils import files_exist
 
 PROMPT_EMAIL = rf"""
 ADD INSTRUCTIONS...
@@ -22,10 +34,10 @@ def _prompt(prompt_file, prompt_name, input_files):
     start = time.time()
     files_exist([prompt_file, *input_files])
     command = [
-        "/home/marco/scripts/aider",
+        AIDER_SCRIPT_PATH,
         *input_files,
         "--model",
-        "gemini-2.5-pro",
+        AIDER_MODEL,
         "--message-file",
         prompt_file,
         # "--yes", # Can be used if it's prompting for questions
@@ -40,12 +52,12 @@ def _prompt(prompt_file, prompt_name, input_files):
 
 def update_resume():
     """Update resume files with Aider to match the job description."""
-    input_files = ["JOB_DESCRIPTION.md", *RESUME_FILES]
+    input_files = [JOB_DESCRIPTION_FILE, *RESUME_FILES]
     prompts = [
-        ("prompts/1-summary.txt", "Summary"),
-        ("prompts/4-technologies.txt", "Technologies"),
-        ("prompts/5-keywords.txt", "Keywords"),
-        ("prompts/7-header.txt", "Header"),
+        (PROMPT_SUMMARY, "Summary"),
+        (PROMPT_TECHNOLOGIES, "Technologies"),
+        (PROMPT_KEYWORDS, "Keywords"),
+        (PROMPT_HEADER, "Header"),
     ]
     placeholders = {}
     for _, prompt_name in prompts:
@@ -71,12 +83,12 @@ def update_cover_letter():
     """
     Update cover letter with Aider to match the job description.
     """
-    files = ["JOB_DESCRIPTION.md", *RESUME_FILES, "coverletter.tex"]
+    files = [JOB_DESCRIPTION_FILE, *RESUME_FILES, COVER_LETTER_FILE]
     # _prompt(PROMPT_LETTER, "Cover Letter", files)
     raise NotImplementedError()
 
 
 def update_email():
-    files = ["JOB_DESCRIPTION.md", *RESUME_FILES, "EMAIL_DRAFT.md"]
+    files = [JOB_DESCRIPTION_FILE, *RESUME_FILES, EMAIL_DRAFT_FILE]
     _prompt(PROMPT_EMAIL, "Email", files)
     raise NotImplementedError()
