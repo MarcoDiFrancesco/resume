@@ -7,8 +7,8 @@ import pytest
 from main import main
 
 
-@patch("utils.posting.files_exist")
-def test_main(mock_files_exist):
+@patch("main.copy_text_to_file")  # Prevent JOB_DESCRIPTION.md file creation
+@patch("utils.posting.files_exist")  # Skip file existence checks
+def test_main(mock_files_exist, mock_copy_text_to_file):
     """Test that main() runs without errors."""
-    # Mock files_exist to skip file existence checks
     main()
