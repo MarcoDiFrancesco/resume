@@ -47,3 +47,43 @@ def reset_git_changes(fnames):
             # Reset git changes. Only unstaged changes are reset.
             repo.git.checkout("--", fname)
             st.text(f"[📌] Git changes in '{fname}' were reset.")
+
+
+def compile_latex(file_path: str):
+    """
+    Compile a LaTeX file using lualatex.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        st.error(f"LaTeX file not found: {file_path}")
+        return
+
+    work_dir = path.parent
+    file_name = path.name
+    build_dir = work_dir / "build"
+    build_dir.mkdir(exist_ok=True)
+
+    with st.spinner(f"Compiling {file_name}..."):
+        try:
+            result = subprocess.run(
+                [
+                    "lualatex",
+                    "-output-directory=build",
+                    "-interaction=nonstopmode",
+                    file_name,
+                ],
+                cwd=work_dir,
+                capture_output=True,
+                text=True,
+            )
+
+            if result.returncode == 0:
+                st.success(f"Successfully compiled {file_name}")
+            else:
+                st.error(f"Failed to compile {file_name}")
+                with st.expander("Compilation Logs"):
+                    st.code(result.stdout)
+                    if result.stderr:
+                        st.code(result.stderr)
+        except Exception as e:
+            st.error(f"Error compiling LaTeX: {str(e)}")

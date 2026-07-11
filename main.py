@@ -13,9 +13,11 @@ from app.config import (
     JOB_DESCRIPTION_FILE,
     NOTION_PURPOSE_PAGE_URL,
     RESUME_FILES,
+    RESUME_MAIN_FILE,
 )
 from app.utils import aider, posting
 from app.utils.helpers import (
+    compile_latex,
     copy_text_to_file,
     reset_git_changes,
 )
@@ -84,11 +86,13 @@ def update_buttons(notion: Notion):
         reset_git_changes(RESUME_FILES)
         aider.update_resume()
         notion.set_applied_and_date()
+        compile_latex(RESUME_MAIN_FILE)
 
     if st.button("2️⃣ Update Cover letter", **button_config):
         with st.status("Cover letter", expanded=True):
             reset_git_changes([COVER_LETTER_FILE])
             aider.update_cover_letter()
+            compile_latex(COVER_LETTER_FILE)
 
     if st.button("3️⃣ Update Email", **button_config):
         with st.status("Email", expanded=True):
