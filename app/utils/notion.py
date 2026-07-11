@@ -8,8 +8,8 @@ from md2notionpage import core
 from notion2md.exporter.block import StringExporter
 from notion_client import Client
 
-from config import NOTION_PAGE_SIZE
-from utils.utils import page_is_underlined
+from app.config import NOTION_PAGE_SIZE
+from app.utils.helpers import page_is_underlined
 
 
 class Notion:

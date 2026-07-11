@@ -4,7 +4,7 @@ import time
 
 import streamlit as st
 
-from config import (
+from app.config import (
     AIDER_MODEL,
     AIDER_SCRIPT_PATH,
     COVER_LETTER_FILE,
@@ -16,7 +16,7 @@ from config import (
     PROMPT_TECHNOLOGIES,
     RESUME_FILES,
 )
-from utils.utils import files_exist
+from app.utils.helpers import files_exist
 
 PROMPT_EMAIL = rf"""
 ADD INSTRUCTIONS...

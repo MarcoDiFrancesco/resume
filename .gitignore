@@ -1,11 +1,6 @@
 *.ttf
-*.aux
-*.fdb_latexmk
-*.fls
-*.log
-*.pdf
-*.out
-*.synctex.gz
+latex/build/*
 .aider*
 .env
 *(busy)
+app/data/*.md

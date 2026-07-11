@@ -5,7 +5,7 @@ import streamlit as st
 from groq import Groq
 from openai import OpenAI
 
-from config import GEMINI_FLASH_MODEL, LLAMA_MODEL
+from app.config import GEMINI_FLASH_MODEL, LLAMA_MODEL
 
 
 class Llm:

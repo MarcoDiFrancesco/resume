@@ -1,10 +1,27 @@
-# Resume Fineturne
+# Resume Finetune
 
 **Python version: 3.12**
 
+## Running the App
+
 ```bash
 cd ~/projects/resume
-resume-finetune
+streamlit run main.py
 ```
 
-![images/home-screenshot-2.png](images/home-screenshot-2.png)
+![home-screenshot-2](docs/images/home-screenshot-2.png)
+
+## Compiling LaTeX
+
+**Automatic Compilation:**
+If you are using an IDE extension like LaTeX Workshop for VS Code, compiling is usually handled automatically on save. Make sure your root file is set to `latex/resume.tex` and that your tool chain is configured to output to the `build/` directory relative to the latex folder.
+
+**Manual Compilation:**
+To compile the resume manually from the command line, run the following commands:
+
+```bash
+cd latex
+lualatex -output-directory=build resume.tex
+```
+
+The generated PDF will be located at `latex/build/resume.pdf`.

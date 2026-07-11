@@ -2,16 +2,16 @@ import os
 
 import streamlit as st
 
-from config import (
+from app.config import (
     COVER_LETTER_FILE,
     EMAIL_DRAFT_FILE,
     JOB_DESCRIPTION_FILE,
     NOTION_PURPOSE_PAGE_URL,
     RESUME_FILES,
 )
-from utils import aider, posting
-from utils.notion import Notion
-from utils.utils import (
+from app.utils import aider, posting
+from app.utils.notion import Notion
+from app.utils.helpers import (
     copy_text_to_file,
     reset_git_changes,
 )
