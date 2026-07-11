@@ -1,11 +1,11 @@
 import os
 
+import streamlit as st
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
-import streamlit as st
 
 from app.config import (
     COVER_LETTER_FILE,
@@ -112,8 +112,11 @@ def main():
 
     with right_col:
         st.header("Update CV/Cover Letter")
-        browser_buttons(notion)
-        update_buttons(notion)
+        if notion:
+            browser_buttons(notion)
+            update_buttons(notion)
+        else:
+            st.info("No active posting. Add new postings to Notion DB.")
         st.warning("Check Miro for new project setup!")
 
 

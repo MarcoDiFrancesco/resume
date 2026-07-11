@@ -28,11 +28,11 @@ PROMPT_HEADER = "app/prompts/7-header.txt"
 
 # Aider configuration
 AIDER_SCRIPT_PATH = "/home/marco/scripts/aider"
-AIDER_MODEL = "gemini/gemini-2.5-pro"
+AIDER_MODEL = "openai/vertex_ai/gemini-3.1-pro-preview"
 
 # LLM model names
-GEMINI_FLASH_MODEL = "gemini-2.5-flash"
-LLAMA_MODEL = "llama-3.3-70b-versatile"
+GEMINI_FLASH_MODEL = "vertex_ai/gemini-3.5-flash"
+GEMINI_FLASH_LITE_MODEL = "vertex_ai/gemini-3.1-flash-lite"
 
 # Notion query configuration
 NOTION_PAGE_SIZE = 25

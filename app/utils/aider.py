@@ -40,6 +40,9 @@ def _prompt(prompt_file, prompt_name, input_files):
         AIDER_MODEL,
         "--message-file",
         prompt_file,
+        "--map-tokens",
+        "256000",
+        "--no-show-model-warnings",
         # "--yes", # Can be used if it's prompting for questions
     ]
     result = subprocess.run(command, capture_output=True, text=True)

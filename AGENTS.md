@@ -37,7 +37,7 @@ When interacting with the user, prioritize their mental well-being, clarity, and
 - **Skill Discussion:** When discussing the user's skills and experience, focus on validation and building confidence.
 - **Feedback:** Provide constructive, encouraging feedback. Avoid harsh critiques, overwhelming lists of flaws, or pressure.
 - **Guardrails against Overthinking:** The user is highly structured and hyper-rational. **YOU MUST gently STOP the user** if they begin overthinking, overengineering solutions, or falling back into rigid, unhealthy routines (e.g., forcing daily quotas at the expense of well-being). Remind them that their mental health comes first.
-- **Verification:** Do not run ad-hoc verification scripts after modifying files. The user prefers to skip automated verifications.
+- **Verification:** Do not run ad-hoc verification scripts after modifying files. The user prefers to skip automated verifications. Additionally, the Streamlit codebase should never be compiled for testing.
 
 ## Part 4: The Project & Repository
 

@@ -37,7 +37,7 @@ class Notion:
         )
         return query["results"]
 
-    def fetch_page_from_db(self):
+    def fetch_page_from_db(self) -> bool:
         """Fetch 'Not Applied' posting.
 
         Priority:
@@ -76,9 +76,10 @@ class Notion:
             txt_box.write(
                 "⬆️ No new posting 'Non Applied' found. Add new postings to Notion DB."
             )
-            raise ValueError(
+            st.warning(
                 "❌ No new posting 'Non Applied' found. Add new postings to Notion DB."
             )
+            return False
         else:
             self.page = query["results"][0]
             notion_page_time = dateutil.parser.parse(self.page["created_time"]).replace(
@@ -107,8 +108,9 @@ class Notion:
             txt_box.code(
                 txt_print.format(len(query["results"]), title, company, time_delta_str)
             )
+            return True
 
-    def check_duplicate_page(self) -> None:
+    def check_duplicate_page(self) -> bool:
         """
         Check for duplicates of this posting.
         Posting is a duplicate if:
@@ -150,10 +152,11 @@ class Notion:
             err_str = "❌ **Duplicate found. Posting has duplicate with same Title+Company or same URL:**\n"
             for page in query["results"]:
                 err_str += f"  - [{page['url']}]({page['url']})\n"
-            st.markdown(err_str)
-            raise ValueError("Duplicate found. Read details above.")
+            st.warning(err_str)
+            return False
+        return True
 
-    def check_db_missing_files(self) -> None:
+    def check_db_missing_files(self) -> bool:
         """Check if DB contains pages which are 'Applied' but contain no documents."""
         query = self._query_db(
             filter={
@@ -171,11 +174,12 @@ class Notion:
         )
         # Check if there is more than one page
         if len(query["results"]) != 0:
-            err_str = "[📂] **No CV attached. These postings are maked as 'Applied' but have no uploaded document:**\n"
+            err_str = "[📂] **No CV attached. These postings are marked as 'Applied' but have no uploaded document:**\n"
             for page in query["results"]:
                 err_str += f"  - {page['url']}\n"
-            st.markdown(err_str)
-            raise ValueError("No CV attached. Read details above.")
+            st.warning(err_str)
+            return False
+        return True
 
     def check_page_properties(self) -> bool:
         """
@@ -224,7 +228,9 @@ class Notion:
                 "url": {"equals": url},
             }
         )
-        assert len(query["results"]) <= 1, "Duplicate posting with same URL."
+        if len(query["results"]) > 1:
+            st.error("Duplicate posting with same URL.")
+            return False
         self.page = query["results"][0]
         st.subheader("Checks")
         checks_ok = all(
@@ -244,8 +250,24 @@ class Notion:
 
         return checks_ok
 
+    # def get_descr(self):
+    #     print("=====", self.page)
+    #     print("-----", StringExporter(block_id=self.page["id"]).export())
+    #     return StringExporter(block_id=self.page["id"]).export()
+
     def get_descr(self):
-        return StringExporter(block_id=self.page["id"]).export()
+        response = self.notion.request(
+            path=f"pages/{self.page['id']}/markdown", method="get"
+        )
+        all_markdown = response.get("markdown", "")
+        # Handle truncated or unknown blocks
+        for block_id in response.get("unknown_block_ids", []):
+            block_resp = self.notion.request(
+                path=f"pages/{block_id}/markdown", method="get"
+            )
+            if "markdown" in block_resp:
+                all_markdown += "\n" + block_resp["markdown"]
+        return all_markdown
 
     def get_descr_with_props(self) -> str:
         """Returns Notion page details in markdown. Includes both properties and body.
