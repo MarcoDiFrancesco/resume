@@ -4,10 +4,19 @@
 
 ## Running the App
 
-```bash
-cd ~/projects/resume
-streamlit run main.py
-```
+1. **Install dependencies:**
+   ```bash
+   python3.12 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+2. **Run the application:**
+   ```bash
+   source .venv/bin/activate
+   streamlit run main.py
+   ```
+   *(Note: The app automatically loads variables from your `.env` file.)*
 
 ![home-screenshot-2](docs/images/home-screenshot-2.png)
 
