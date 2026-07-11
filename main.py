@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -14,11 +15,11 @@ from app.config import (
     RESUME_FILES,
 )
 from app.utils import aider, posting
-from app.utils.notion import Notion
 from app.utils.helpers import (
     copy_text_to_file,
     reset_git_changes,
 )
+from app.utils.notion import Notion
 
 
 def db_buttons():

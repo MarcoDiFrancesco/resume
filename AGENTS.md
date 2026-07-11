@@ -5,7 +5,7 @@ This document provides crucial context about the user, their career goals, and t
 ## Part 1: The User & The Mission
 
 ### Background & Past Experience
-The user graduated with a Computer Science degree in August 2024. Following graduation and the Camino, they spent 3 months in Denmark (Oct-Dec 2024) aggressively applying for jobs (3+ applications per day, every day, making a total of 330 applications to land their current job) while dealing with isolation and difficult weather. 
+The user graduated with a Computer Science degree in August 2024. Following graduation and the Camino, they spent 3 months in Denmark (Oct-Dec 2024) aggressively applying for jobs (3+ applications per day, every day, making a total of 330 applications to land their current job) while dealing with isolation and difficult weather.
 
 In the past, the user adopted an extreme, hyper-structured approach (never taking a day off, not even Christmas) and focused entirely on telling recruiters what they wanted to hear. This stripped away their own identity and desires, resulting in job-hunting trauma and severe burnout. Looking at their CV currently triggers these negative memories.
 
@@ -18,8 +18,8 @@ The user has been working at a bank for 1 year, officially titled a "Data Scient
 
 ### Career Goals
 The user aims to transition to a new role around the 2-year mark.
-- **Tech Interests:** Highly interested in Kubernetes (studying it every morning since Nov), Docker, and Infrastructure. 
-- **Ideal Role:** A blend of Infrastructure + traditional Machine Learning (MLOps / Data Platform Engineering). 
+- **Tech Interests:** Highly interested in Kubernetes (studying it every morning since Nov), Docker, and Infrastructure.
+- **Ideal Role:** A blend of Infrastructure + traditional Machine Learning (MLOps / Data Platform Engineering).
 - **Environment:** They consider themselves "good at both" but not an extreme pro. A major requirement for the next role is finding an environment with experienced senior engineers they can learn from.
 
 ## Part 2: Resume Philosophy
@@ -27,7 +27,7 @@ The user aims to transition to a new role around the 2-year mark.
 To avoid past burnout, the job hunt and resume tailoring must be authentic and highly focused.
 - **Authentic Positioning:** Do NOT let the user fall into the trap of just "saying what recruiters want to hear." Ensure the CV and job search reflect what the *user* actually wants to do (K8s, Infra, ML) and helps them find a mutual fit.
 - **Maintain the ML Core:** Do not erase the user's strong ML Engineering background (taking models from research to production). Balance this history with their current infrastructure/pipeline work.
-- **Accurate Scope:** Do not overstate specific past projects (like "optimizing inference" from a thesis) as if they are the primary daily identity. 
+- **Accurate Scope:** Do not overstate specific past projects (like "optimizing inference" from a thesis) as if they are the primary daily identity.
 
 ## Part 3: Agent Directives (Crucial for all LLMs/Agents)
 

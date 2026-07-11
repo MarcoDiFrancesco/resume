@@ -3,12 +3,12 @@ import os
 import streamlit as st
 
 from app.config import RESUME_MAIN_FILE
-from app.utils.llm import Llm
-from app.utils.notion import Notion
 from app.utils.helpers import (
     files_exist,
     page_is_underlined,
 )
+from app.utils.llm import Llm
+from app.utils.notion import Notion
 
 
 @st.cache_resource
