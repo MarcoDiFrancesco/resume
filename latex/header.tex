@@ -99,7 +99,13 @@
 %-------------------------------------------------------------------------------
 
 % Function for hidden keywords
-\newcommand{\keywords}[1]{\vspace{-8pt}{\fontsize{1}{0}\selectfont \textcolor{white}{#1}}\vspace{-8pt}}
+\newcommand{\keywords}[1]{%
+  \ifstrempty{#1}{}{%
+    \nointerlineskip
+    \vbox to 0pt{\vss\hbox{\fontsize{1}{0}\selectfont\textcolor{white}{#1}}}%
+    \nointerlineskip
+  }%
+}
 
 % % Function to calculate work duration
 % % e.g. "1 year, 2 months"
