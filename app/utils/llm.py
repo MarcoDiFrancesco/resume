@@ -51,31 +51,10 @@ class Llm:
             """,
             "req_ml": "Check if this position includes working with statistical models, like training or deploying machine learning models or AI models. If so: '➡️ Machine Learning included'. Otherwise: '❌ No mentions of Machine Learning'",
             "req_letter": f"Check if the cover letter or motivation letter is required. {req_explain_prompt}. If required return: '✅ Letter required: ...', otherwise '➡️ Letter not required'",
-            "req_email": "Check if an email of a recruiter is provided for asking questions regarding the position. Replace ... with the email provided. If provided return: '✅ Email proveded: ...', otherwise '➡️ Email not provided'",
+            "req_email": "Check if an email of a recruiter is provided for asking questions regarding the position. Replace ... with the email provided. If provided return: '✅ Email provided: ...', otherwise '➡️ Email not provided'",
+            "req_phone": "Check if a phone number of a recruiter is provided for asking questions regarding the position. Replace ... with the phone number provided. If provided return: '✅ Phone provided: ...', otherwise '➡️ Phone not provided'",
         }
         reqs_out = {}
-        reqs_print = """
-        ┌────────────────────────────────────────────────────────────────────────────
-        │ Experience requirements
-        ├────────────┬───────────────────────────────────────────────────────────────
-        │ Language   │ {}
-        │ Student    │ {}
-        │ PhD        │ {}
-        │ Years      │ {}
-        │ ML         │ {}
-        └────────────┴───────────────────────────────────────────────────────────────
-
-        ┌────────────────────────────────────────────────────────────────────────────
-        │ Attachments
-        ├───────────┬────────────────────────────────────────────────────────────────
-        │ Letter    │ {}
-        │ Email     │ {}
-        └───────────┴────────────────────────────────────────────────────────────────
-        """
-        txt_box = st.code(
-            reqs_print.format("...", "...", "...", "...", "...", "...", "..."),
-            language="plaintext",
-        )
 
         def fetch_requirement(req_name, req_desc, page_content):
             return req_name, self._query(GEMINI_FLASH_MODEL, req_desc, page_content)
@@ -92,17 +71,40 @@ class Llm:
                 req_name, res = future.result()
                 reqs_out[req_name] = res
 
-        txt_box.code(
-            reqs_print.format(
-                reqs_out["req_lang"],
-                reqs_out["req_stud"],
-                reqs_out["req_phd"],
-                reqs_out["req_years"],
-                reqs_out["req_ml"],
-                reqs_out["req_letter"],
-                reqs_out["req_email"],
+        st.subheader("📋 Posting Analysis")
+        col1, col2 = st.columns([3, 2])
+
+        with col1:
+            st.dataframe(
+                [
+                    {"Category": "Language", "Status": reqs_out["req_lang"]},
+                    {"Category": "Student", "Status": reqs_out["req_stud"]},
+                    {"Category": "PhD", "Status": reqs_out["req_phd"]},
+                    {"Category": "Years", "Status": reqs_out["req_years"]},
+                    {"Category": "ML", "Status": reqs_out["req_ml"]},
+                ],
+                column_config={
+                    "Category": st.column_config.TextColumn(None),
+                    "Status": st.column_config.TextColumn(None),
+                },
+                hide_index=True,
+                use_container_width=True,
             )
-        )
+
+        with col2:
+            st.dataframe(
+                [
+                    {"Category": "Letter", "Status": reqs_out["req_letter"]},
+                    {"Category": "Email", "Status": reqs_out["req_email"]},
+                    {"Category": "Phone", "Status": reqs_out["req_phone"]},
+                ],
+                column_config={
+                    "Category": st.column_config.TextColumn(None),
+                    "Status": st.column_config.TextColumn(None),
+                },
+                hide_index=True,
+                use_container_width=True,
+            )
 
     def query_page_descr(self, page_descr: str) -> str:
         """Fix markdown syntax with LLM."""
@@ -110,14 +112,14 @@ class Llm:
             GEMINI_FLASH_LITE_MODEL,
             r"""
             Check if the markdown syntax is correct. If not, fix it.
-            Remove all **bold** and *italic* formatting.
             Output only the markdown.
             Syntax:
                 - if there is a list, use '-' instead of '*'.
                 - do not use html tags like '<br/>'.
-                - never use leading spaces in the beginning of the line.
+                - do not use leading spaces in the beginning of the line.
+                - do not format links in markdown, instead in plain text in square brackets, e.g. [https://linkedin.com/xyz].
                 - preserve line breaks as in the original text, including double line breaks (\n\n).
-                - if there are links do not format them in markdown, instead in plain text in square brackets, e.g. [https://linkedin.com/xyz].
+                - Remove all **bold** and *italic* formatting. Then, add in h3 (with hashtags) the section headings, and **bold** the subsections.
             """,
             page_descr,
         )

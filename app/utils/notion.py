@@ -3,6 +3,7 @@ import os
 from datetime import timedelta
 
 import dateutil
+import httpx
 import streamlit as st
 from md2notionpage import core
 from notion2md.exporter.block import StringExporter
@@ -28,13 +29,15 @@ class Notion:
             )
         return self.page
 
-    def _query_db(self, **kwargs):
+    def _query_db(self, **kwargs) -> dict:
         # database_id may be provided to be external
         if "database_id" not in kwargs:
             kwargs["database_id"] = self.db_id
 
         query = self.notion.databases.query(page_size=NOTION_PAGE_SIZE, **kwargs)
-        return query
+        if isinstance(query, dict):
+            return query
+        raise TypeError("Notion API query did not return a dictionary")
 
     def get_all_pages(self):
         """Fetch the first 25 pages from the database."""
@@ -186,89 +189,21 @@ class Notion:
             return False
         return True
 
-    def check_page_properties(self) -> bool:
-        """
-        Check the following properties:
-        - City: if label is non-empty
-        - Company: if text is non-empty
-        """
-        # def _check_property_city():
-        #     if not self.page_data["properties"]["City"]["select"]:
-        #         st.markdown(
-        #             f"📑 Property *City* in [Notion page]({self.page_data['url']}) is empty → Reload Streamlit page to check again"
-        #         )
-        #         return False
-        #     return True
-
-        def _check_property_company():
-            err_message = st.empty()
-            if not self.page_data["properties"]["Company"]["rich_text"]:
-                err_message.markdown(
-                    f"📑 Property *Company* in Notion page is empty → Edit Notion page and rerun checks"
-                )
-                return False
-            else:
-                err_message.markdown("✅ Property *Company* in Notion page found.")
-                return True
-
-        def _check_page_underlined():
-            err_message = st.empty()
-            if not page_is_underlined(self.get_descr()):
-                err_message.markdown(
-                    f"❌ Highlighting of Notion page in ***bold-italic*** not found → Edit Notion page and rerun checks"
-                )
-                return False
-            else:
-                err_message.markdown(
-                    "✅ Highlighting of Notion page in ***bold-italic*** found."
-                )
-                return True
-
-        url = self.page_data["properties"]["URL"]["url"]
-
-        query = self._query_db(
-            filter={
-                "property": "URL",
-                "url": {"equals": url},
-            }
-        )
-        if len(query["results"]) > 1:
-            st.error("Duplicate posting with same URL.")
-            return False
-        self.page = query["results"][0]
-        st.subheader("Checks")
-        checks_ok = all(
-            [
-                # _check_property_city(), # Deprecated, not setting working city anymore
-                _check_property_company(),
-                _check_page_underlined(),
-            ]
-        )
-        if st.button(
-            "🔄 Re-run checks",
-            type="primary",
-            use_container_width=True,
-            disabled=checks_ok,
-        ):
-            st.rerun()
-
-        return checks_ok
-
-    # def get_descr(self):
-    #     print("=====", self.page)
-    #     print("-----", StringExporter(block_id=self.page["id"]).export())
-    #     return StringExporter(block_id=self.page["id"]).export()
-
     def get_descr(self):
         response = self.notion.request(
             path=f"pages/{self.page_data['id']}/markdown", method="get"
         )
+        if not isinstance(response, dict):
+            raise TypeError("Notion API request did not return a dictionary")
+
         all_markdown = response.get("markdown", "")
         # Handle truncated or unknown blocks
         for block_id in response.get("unknown_block_ids", []):
             block_resp = self.notion.request(
                 path=f"pages/{block_id}/markdown", method="get"
             )
+            if not isinstance(block_resp, dict):
+                continue
             if "markdown" in block_resp:
                 all_markdown += "\n" + block_resp["markdown"]
         return all_markdown
@@ -347,15 +282,61 @@ class Notion:
         )
         self.page = None
 
-    def set_applied_and_date(self) -> None:
+    def upload_pdf_resume(self) -> str:
+        """Upload the generated PDF resume using Notion's file upload API (2026-03-11)."""
+        txt_box = st.text("[📑] Uploading resume to Notion...")
+        token = os.environ["NOTION_API_TOKEN"]
+
+        # 1. Create file upload
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Notion-Version": "2026-03-11",
+            "Content-Type": "application/json",
+        }
+        res = httpx.post(
+            "https://api.notion.com/v1/file_uploads",
+            headers=headers,
+            json={
+                "mode": "single_part",
+                "filename": "resume.pdf",
+                "content_type": "application/pdf",
+            },
+        )
+        res.raise_for_status()
+
+        file_id = res.json()["id"]
+
+        # 2. Upload file contents
+        with open("latex/build/resume.pdf", "rb") as f:
+            send_headers = {
+                "Authorization": f"Bearer {token}",
+                "Notion-Version": "2026-03-11",
+            }
+            send_res = httpx.post(
+                f"https://api.notion.com/v1/file_uploads/{file_id}/send",
+                headers=send_headers,
+                files={"file": ("resume.pdf", f, "application/pdf")},
+            )
+            send_res.raise_for_status()
+
+        txt_box.text("[📑] Resume uploaded successfully.")
+        return file_id
+
+    def set_applied_and_date(self, file_id: str) -> None:
         txt_box = st.text(f"[📑] Setting page to 'Applied'...")
         # If time is before 6am set as previous day
         date = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
+
+        properties = {
+            "Stage": {"select": {"name": "Applied"}},
+            "_Day": {"date": {"start": date}},
+            "Files": {
+                "files": [{"type": "file_upload", "file_upload": {"id": file_id}}]
+            },
+        }
+
         self.notion.pages.update(
             page_id=self.page_data["id"],
-            properties={
-                "Stage": {"select": {"name": "Applied"}},
-                "_Day": {"date": {"start": date}},
-            },
+            properties=properties,
         )
         txt_box.text(f"[📑] Page set to 'Applied'.      ")

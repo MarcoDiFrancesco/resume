@@ -29,8 +29,10 @@ def main():
     with right_col:
         st.header("Tailoring")
         if notion and notion.page:
-            tailoring.tailoring_buttons(notion)
-            tailoring.tailoring_update(notion)
+            tailoring.tailoring_links(notion)
+            is_valid = tailoring.tailoring_check(notion)
+            tailoring.tailoring_update(notion, is_valid)
+            tailoring.tailoring_conclusion(notion)
         else:
             st.info("No active posting. Add new postings to Notion DB.")
 

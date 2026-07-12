@@ -57,43 +57,70 @@ def posting_fetch() -> Notion:
 @st.cache_data
 def posting_check(_notion: Notion) -> bool:
     """Run all pre-flight and database checks."""
-    st.subheader("Checks")
+    with st.status("Running pre-flight checks...", expanded=True) as status:
+        if not files_exist([RESUME_MAIN_FILE]):
+            st.error(f"❌ Main resume file '{RESUME_MAIN_FILE}' missing.")
+            status.update(
+                label="❌ Pre-flight checks failed", state="error", expanded=True
+            )
+            return False
+        st.write(f"✅ Main resume file '{RESUME_MAIN_FILE}' found.")
 
-    if not files_exist([RESUME_MAIN_FILE]):
-        return False
-    st.success(f"✅ Main resume file '{RESUME_MAIN_FILE}' found.")
+        if not _notion.check_db_missing_files():
+            status.update(
+                label="❌ Pre-flight checks failed", state="error", expanded=True
+            )
+            return False
+        st.write("✅ DB check: All 'Applied' postings have CVs attached.")
 
-    if not _notion.check_db_missing_files():
-        return False
-    st.success("✅ DB check: All 'Applied' postings have CVs attached.")
+        if not _notion.page:
+            st.warning(
+                "❌ No new posting 'Non Applied' found. Add new postings to Notion DB."
+            )
+            status.update(
+                label="❌ Pre-flight checks failed", state="error", expanded=True
+            )
+            return False
 
-    if not _notion.page:
-        st.warning(
-            "❌ No new posting 'Non Applied' found. Add new postings to Notion DB."
-        )
-        return False
+        if not _notion.check_duplicate_page():
+            status.update(
+                label="❌ Pre-flight checks failed", state="error", expanded=True
+            )
+            return False
+        st.write("✅ DB check: No duplicates found for this posting.")
 
-    if not _notion.check_duplicate_page():
-        return False
-    st.success("✅ DB check: No duplicates found for this posting.")
+        if not _notion.page_data["properties"]["Company"]["rich_text"]:
+            st.error(
+                "❌ Property *Company* in Notion page is empty. Edit Notion page and fetch again."
+            )
+            status.update(
+                label="❌ Pre-flight checks failed", state="error", expanded=True
+            )
+            return False
+        st.write("✅ Property *Company* in Notion page found.")
 
-    return True
+        status.update(label="✅ All checks passed", state="complete", expanded=False)
+        return True
 
 
 @st.cache_data
 def posting_info(_notion: Notion):
     """Display basic information about the fetched posting."""
     info = _notion.get_page_info()
-    txt_print = f"""
-    ┌────────────────────────────────────────────────────────────────────────────
-    │ Posting ({info['remaining']} left)
-    ├────────────┬───────────────────────────────────────────────────────────────
-    │ Title      │ {info['title']}
-    │ Company    │ {info['company']}
-    │ Page age   │ {info['age']}
-    └────────────┴───────────────────────────────────────────────────────────────
-    """
-    st.code(txt_print)
+    st.subheader(f"ℹ️ Posting ({info['remaining']} left)")
+    st.dataframe(
+        [
+            {"Attribute": "Title", "Value": info["title"]},
+            {"Attribute": "Company", "Value": info["company"]},
+            {"Attribute": "Page age", "Value": info["age"]},
+        ],
+        column_config={
+            "Attribute": st.column_config.TextColumn(None),
+            "Value": st.column_config.TextColumn(None),
+        },
+        hide_index=True,
+        use_container_width=True,
+    )
 
 
 @st.cache_data
