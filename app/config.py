@@ -6,7 +6,6 @@ NOTION_PURPOSE_PAGE_URL = "https://www.notion.so/marcodifrancesco/Finding-My-Pur
 # File paths
 RESUME_MAIN_FILE = "latex/resume.tex"
 COVER_LETTER_FILE = "latex/coverletter.tex"
-EMAIL_DRAFT_FILE = "app/data/EMAIL_DRAFT.md"
 JOB_DESCRIPTION_FILE = "app/data/JOB_DESCRIPTION.md"
 
 RESUME_FILES = [
@@ -25,6 +24,7 @@ PROMPT_SUMMARY = "app/prompts/1-summary.txt"
 PROMPT_TECHNOLOGIES = "app/prompts/4-technologies.txt"
 PROMPT_KEYWORDS = "app/prompts/5-keywords.txt"
 PROMPT_HEADER = "app/prompts/7-header.txt"
+PROMPT_LETTER = "app/prompts/cover-letter.txt"
 
 # Aider configuration
 AIDER_SCRIPT_PATH = "/home/marco/scripts/aider"

@@ -2,7 +2,6 @@ import streamlit as st
 
 from app.config import (
     COVER_LETTER_FILE,
-    EMAIL_DRAFT_FILE,
     JOB_DESCRIPTION_FILE,
     RESUME_FILES,
     RESUME_MAIN_FILE,
@@ -44,6 +43,9 @@ def tailoring_check(notion: Notion) -> bool:
     )
     if len(query["results"]) > 1:
         st.error("Duplicate posting with same URL.")
+        return False
+    if len(query["results"]) == 0:
+        st.error("Posting not found in Notion.")
         return False
     notion.page = query["results"][0]
 
@@ -93,11 +95,6 @@ def tailoring_update(notion: Notion, is_valid: bool):
             reset_git_changes([COVER_LETTER_FILE])
             aider.update_cover_letter()
             compile_latex(COVER_LETTER_FILE)
-
-    if st.button("3️⃣ Update Email", **button_config):
-        with st.status("Email", expanded=True):
-            reset_git_changes([EMAIL_DRAFT_FILE])
-            aider.update_email()
 
 
 def tailoring_conclusion(notion: Notion):

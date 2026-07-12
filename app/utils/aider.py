@@ -9,24 +9,14 @@ from app.config import (
     AIDER_MODEL,
     AIDER_SCRIPT_PATH,
     COVER_LETTER_FILE,
-    EMAIL_DRAFT_FILE,
     JOB_DESCRIPTION_FILE,
     PROMPT_HEADER,
     PROMPT_KEYWORDS,
+    PROMPT_LETTER,
     PROMPT_SUMMARY,
     PROMPT_TECHNOLOGIES,
     RESUME_FILES,
 )
-
-PROMPT_EMAIL = rf"""
-ADD INSTRUCTIONS...
-
-(Prompt Email Draft - v9)
-
-Rewrite the EMAIL_DRAFT.md to fit the JOB_DESCRIPTION.md. Rewrite the 2 questions to fit the job description.
-- Keep them without corporate jargon and keep the tone very technical.
-- Do not write my experience, only make the questions.
-"""
 
 
 def _prompt(prompt_file, prompt_name, input_files):
@@ -89,11 +79,5 @@ def update_cover_letter():
     Update cover letter with Aider to match the job description.
     """
     files = [JOB_DESCRIPTION_FILE, *RESUME_FILES, COVER_LETTER_FILE]
-    # _prompt(PROMPT_LETTER, "Cover Letter", files)
-    raise NotImplementedError()
-
-
-def update_email():
-    files = [JOB_DESCRIPTION_FILE, *RESUME_FILES, EMAIL_DRAFT_FILE]
-    _prompt(PROMPT_EMAIL, "Email", files)
-    raise NotImplementedError()
+    _, code_output, exec_time = _prompt(PROMPT_LETTER, "Cover Letter", files)
+    st.code(code_output)

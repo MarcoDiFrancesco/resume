@@ -2,7 +2,7 @@ import datetime
 import os
 from datetime import timedelta
 
-import dateutil
+import dateutil.parser
 import httpx
 import streamlit as st
 from md2notionpage import core
@@ -128,7 +128,9 @@ class Notion:
         """
         # LinkedIn URL
         url = self.page_data["properties"]["URL"]["url"]
-        assert url, "[Notion] Check failed. URL is empty."
+        if not url:
+            st.error("❌ **Check failed. URL is empty.**")
+            return False
 
         # Add or remove trailing slash
         if url[-1] == "/":
@@ -229,8 +231,8 @@ class Notion:
         res = "# Job Properties\n"
         res += f"Title: {job_title}\n"
         res += f"Company: {job_company}\n"
-        res += f"==="
-        res += f"# Job Description\n"
+        res += "===\n"
+        res += "# Job Description\n"
         res += self.get_descr()
         return res
 
