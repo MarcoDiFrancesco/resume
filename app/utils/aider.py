@@ -32,6 +32,7 @@ def _prompt(prompt_file, prompt_name, input_files):
         AIDER_MODEL,
         "--message-file",
         prompt_file,
+        # Give Aider a large token limit for the repository map to ensure full context
         "--map-tokens",
         "256000",
         "--no-show-model-warnings",
@@ -61,7 +62,6 @@ def update_resume():
         expander.code("Processing...")
         placeholders[prompt_name] = placeholder
 
-    # Parallel execution
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [executor.submit(_prompt, p[0], p[1], input_files) for p in prompts]
         for future in concurrent.futures.as_completed(futures):

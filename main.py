@@ -1,14 +1,9 @@
-import os
-
 import streamlit as st
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-
 from app.utils import posting, tailoring
-from app.utils.notion import Notion
 
 
 def main():

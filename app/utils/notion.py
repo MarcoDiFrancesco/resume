@@ -6,11 +6,9 @@ import dateutil.parser
 import httpx
 import streamlit as st
 from md2notionpage import core
-from notion2md.exporter.block import StringExporter
 from notion_client import Client
 
 from app.config import NOTION_PAGE_SIZE
-from app.utils.helpers import page_is_underlined
 
 
 class Notion:
@@ -182,7 +180,6 @@ class Notion:
                 ]
             },
         )
-        # Check if there is more than one page
         if len(query["results"]) != 0:
             err_str = "❌ **No CV attached. These postings are marked as 'Applied' but have no uploaded document:**\n"
             for page in query["results"]:

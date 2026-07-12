@@ -1,10 +1,6 @@
-import datetime
-import os
 import subprocess
 from pathlib import Path
 
-import dateutil
-import dateutil.parser
 import streamlit as st
 from git import Repo
 
@@ -40,9 +36,9 @@ def reset_git_changes(fnames):
     """
 
     repo = Repo(".")
-    # Check if repo is in a detached HEAD state
     assert not repo.head.is_detached, "Go to HEAD state: 'git switch master'"
 
+    # repo.index.diff(None) returns files with unstaged changes
     changed_files = [item.a_path for item in repo.index.diff(None)]
     for fname in fnames:
         if fname in changed_files:
