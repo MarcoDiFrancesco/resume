@@ -16,9 +16,9 @@
    source .venv/bin/activate
    streamlit run main.py
    ```
-   *(Note: The app automatically loads variables from your `.env` file.)*
+   *(Note: The app loads variables from your `.env` file.)*
 
-![home-screenshot-2](docs/images/home-screenshot-2.png)
+![home-screenshot-3](docs/images/home-screenshot-3.png)
 
 ## Compiling LaTeX
 
