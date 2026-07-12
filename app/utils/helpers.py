@@ -9,13 +9,15 @@ import streamlit as st
 from git import Repo
 
 
-def files_exist(fnames):
+def files_exist(fnames) -> bool:
     """Check if all input files are present."""
-    for f in fnames:
-        if not Path(f).exists():
-            raise FileNotFoundError(
-                f"[📂] File not found '{f}'. Did you run the script in the 'resume' directory?"
-            )
+    missing = [f for f in fnames if not Path(f).exists()]
+    if missing:
+        st.error(
+            f"❌ [📂] File not found '{missing[0]}'. Did you run the script in the 'resume' directory?"
+        )
+        return False
+    return True
 
 
 def page_is_underlined(page_content: str) -> bool:

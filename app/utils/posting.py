@@ -2,7 +2,7 @@ import os
 
 import streamlit as st
 
-from app.config import RESUME_MAIN_FILE
+from app.config import NOTION_PURPOSE_PAGE_URL, RESUME_MAIN_FILE
 from app.utils.helpers import (
     files_exist,
     page_is_underlined,
@@ -11,31 +11,114 @@ from app.utils.llm import Llm
 from app.utils.notion import Notion
 
 
+def posting_buttons():
+    """Display buttons for Notion links and actions."""
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button(
+            "🍃 Finding My Purpose",
+            NOTION_PURPOSE_PAGE_URL,
+            type="primary",
+            use_container_width=True,
+        )
+    with col2:
+        st.link_button(
+            "📂 Notion DB",
+            f"https://notion.so/{os.environ['NOTION_DB_ID']}",
+            type="primary",
+            use_container_width=True,
+        )
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("🔄 New posting", use_container_width=True):
+            # Clear the cached posting and fetch a new one
+            posting_check.clear()
+            posting_fetch.clear()
+            posting_info.clear()
+            posting_requirements.clear()
+            posting_fix_markdown.clear()
+    with col2:
+        if st.button("🪥 Clean Markdown pages", use_container_width=True):
+            _clean_all_pages_md()
+    with col3:
+        if st.button("⿻ Find Duplicates", use_container_width=True):
+            _find_all_duplicates()
+
+
 @st.cache_resource
-def fetch_posting():
+def posting_fetch() -> Notion:
+    """Fetch the next Notion page."""
     notion = Notion(os.environ["NOTION_DB_ID"])
+    notion.fetch_page_from_db()
+    return notion
+
+
+@st.cache_data
+def posting_check(_notion: Notion) -> bool:
+    """Run all pre-flight and database checks."""
+    st.subheader("Checks")
+
+    if not files_exist([RESUME_MAIN_FILE]):
+        return False
+    st.success(f"✅ Main resume file '{RESUME_MAIN_FILE}' found.")
+
+    if not _notion.check_db_missing_files():
+        return False
+    st.success("✅ DB check: All 'Applied' postings have CVs attached.")
+
+    if not _notion.page:
+        st.warning(
+            "❌ No new posting 'Non Applied' found. Add new postings to Notion DB."
+        )
+        return False
+
+    if not _notion.check_duplicate_page():
+        return False
+    st.success("✅ DB check: No duplicates found for this posting.")
+
+    return True
+
+
+@st.cache_data
+def posting_info(_notion: Notion):
+    """Display basic information about the fetched posting."""
+    info = _notion.get_page_info()
+    txt_print = f"""
+    ┌────────────────────────────────────────────────────────────────────────────
+    │ Posting ({info['remaining']} left)
+    ├────────────┬───────────────────────────────────────────────────────────────
+    │ Title      │ {info['title']}
+    │ Company    │ {info['company']}
+    │ Page age   │ {info['age']}
+    └────────────┴───────────────────────────────────────────────────────────────
+    """
+    st.code(txt_print)
+
+
+@st.cache_data
+def posting_requirements(_notion: Notion):
+    """Fetch and display posting requirements using LLM."""
     llm = Llm()
-
-    files_exist([RESUME_MAIN_FILE])
-    notion.check_db_missing_files()
-
-    if not notion.fetch_page_from_db():
-        return None
-
-    if not notion.check_duplicate_page():
-        return notion
-    page_descr = notion.get_descr()
+    page_descr = _notion.get_descr()
     llm.fetch_requirements(page_descr)
+
+
+@st.cache_data
+def posting_fix_markdown(_notion: Notion):
+    """Format and rewrite Notion page description using LLM if needed."""
+    llm = Llm()
+    page_descr = _notion.get_descr()
 
     with st.expander("Markdown fix with LLM", icon="🗣️"):
         txt_print = "📂 [Old Notion page]({}) → 📂 [New Notion page]({})"
-        txt_box = st.markdown(txt_print.format(notion.page["url"], "..."))
+        txt_box = st.markdown(txt_print.format(_notion.page_data["url"], "..."))
 
         # Skip LLM rewrite if page is already ***underlined***
         if page_is_underlined(page_descr):
             txt_box.markdown(
                 "📂 [Notion page]({}) (text in bold italic found, left unchanged)".format(
-                    notion.page["url"]
+                    _notion.page_data["url"]
                 )
             )
         else:
@@ -48,17 +131,15 @@ def fetch_posting():
                 st.text("📝 New description")
                 st.code(page_descr_new, wrap_lines=True)
 
-            notion_page_new = notion.new_page(page_descr_new)
+            notion_page_new = _notion.new_page(page_descr_new)
             txt_box.markdown(
-                txt_print.format(notion.page["url"], notion_page_new["url"])
+                txt_print.format(_notion.page_data["url"], notion_page_new["url"])
             )
-            notion.delete_page()
-            notion.page = notion_page_new
-
-    return notion
+            _notion.delete_page()
+            _notion.page = notion_page_new
 
 
-def clean_all_pages_md():
+def _clean_all_pages_md():
     """Clean markdown for all pages in the Notion database."""
     notion = Notion(os.environ["NOTION_DB_ID"])
     llm = Llm()
@@ -79,7 +160,7 @@ def clean_all_pages_md():
     st.success("All pages have been processed.")
 
 
-def find_all_duplicates():
+def _find_all_duplicates():
     """Find duplicates for all 'Not Applied' pages in the Notion database."""
     notion = Notion(os.environ["NOTION_DB_ID"])
 

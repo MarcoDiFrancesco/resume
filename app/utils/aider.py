@@ -1,6 +1,7 @@
 import concurrent.futures
 import subprocess
 import time
+from pathlib import Path
 
 import streamlit as st
 
@@ -16,7 +17,6 @@ from app.config import (
     PROMPT_TECHNOLOGIES,
     RESUME_FILES,
 )
-from app.utils.helpers import files_exist
 
 PROMPT_EMAIL = rf"""
 ADD INSTRUCTIONS...
@@ -32,7 +32,9 @@ Rewrite the EMAIL_DRAFT.md to fit the JOB_DESCRIPTION.md. Rewrite the 2 question
 def _prompt(prompt_file, prompt_name, input_files):
     """Run Aider command and return the result and status."""
     start = time.time()
-    files_exist([prompt_file, *input_files])
+    missing = [f for f in [prompt_file, *input_files] if not Path(f).exists()]
+    if missing:
+        raise FileNotFoundError(f"Missing files for prompt {prompt_name}: {missing}")
     command = [
         AIDER_SCRIPT_PATH,
         *input_files,

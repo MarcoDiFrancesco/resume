@@ -26,10 +26,8 @@ repos:
         additional_dependencies:
           ["types-python-dateutil"]
         args: ["--python-version", "3.12", "--ignore-missing-imports"]
-  # - repo: https://github.com/pre-commit/mirrors-mypy
-  #   rev: v0.950
+
+  # - repo: https://github.com/RobertCraigie/pyright-python
+  #   rev: v1.1.411
   #   hooks:
-  #     - id: mypy
-  #       additional_dependencies:
-  #         ["types-requests", "types-pytz", "types-python-dateutil"]
-  #       args: ["--python-version", "3.10"]
+  #     - id: pyright

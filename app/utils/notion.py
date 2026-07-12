@@ -16,6 +16,17 @@ class Notion:
     def __init__(self, db_id: str):
         self.notion = Client(auth=os.environ["NOTION_API_TOKEN"])
         self.db_id = db_id
+        self.page: dict | None = None
+        self.remaining_count = 0
+
+    @property
+    def page_data(self) -> dict:
+        """Returns page data, strictly typed as a dict to satisfy mypy."""
+        if self.page is None:
+            raise RuntimeError(
+                "Attempted to access Notion page data before loading it."
+            )
+        return self.page
 
     def _query_db(self, **kwargs):
         # database_id may be provided to be external
@@ -49,16 +60,6 @@ class Notion:
                   For example, postings above 7 days can be discarded.
             3. Company name: replicating a random choice, but deterministic
         """
-        txt_print = """
-        ┌────────────────────────────────────────────────────────────────────────────
-        │ Posting ({} left)
-        ├────────────┬───────────────────────────────────────────────────────────────
-        │ Title      │ {}
-        │ Company    │ {}
-        │ Page age   │ {}
-        └────────────┴───────────────────────────────────────────────────────────────
-        """
-        txt_box = st.code(txt_print.format("...", "...", "...", "..."))
         query = self._query_db(
             filter={
                 "and": [
@@ -73,42 +74,47 @@ class Notion:
             ],
         )
         if len(query["results"]) == 0:
-            txt_box.write(
-                "⬆️ No new posting 'Non Applied' found. Add new postings to Notion DB."
-            )
-            st.warning(
-                "❌ No new posting 'Non Applied' found. Add new postings to Notion DB."
-            )
+            self.page = None
+            self.remaining_count = 0
             return False
         else:
             self.page = query["results"][0]
-            notion_page_time = dateutil.parser.parse(self.page["created_time"]).replace(
-                tzinfo=datetime.timezone.utc
-            )
-            # Notion page age
-            # TODO: set the page age to resetting at midnight, e.g. adding post at 22:00,
-            #       the following day seeting at 10:00 it's anyway 1 day old
-            time_delta = datetime.datetime.now(datetime.timezone.utc) - notion_page_time
-            title = "".join(
-                self.page["properties"]["Position"]["title"][0]["plain_text"]
-            )
-            if company := self.page["properties"]["Company"]["rich_text"]:
-                company = company[0]["plain_text"]
-            else:
-                company = "?"
-            if time_delta.days >= 2:
-                time_delta_str = f"{time_delta.days} days"
-            if time_delta.days >= 1:
-                time_delta_str = f"{time_delta.days} day"
-            elif time_delta.seconds > 60 * 60:
-                time_delta_str = f"{time_delta.seconds // (60*60)} hours"
-            else:
-                time_delta_str = f"{time_delta.seconds // 60} minutes"
-
-            txt_box.code(
-                txt_print.format(len(query["results"]), title, company, time_delta_str)
-            )
+            self.remaining_count = len(query["results"])
             return True
+
+    def get_page_info(self) -> dict:
+        """Returns details about the fetched page for display."""
+        if not self.page:
+            return {}
+
+        notion_page_time = dateutil.parser.parse(
+            self.page_data["created_time"]
+        ).replace(tzinfo=datetime.timezone.utc)
+        time_delta = datetime.datetime.now(datetime.timezone.utc) - notion_page_time
+        title = "".join(
+            self.page_data["properties"]["Position"]["title"][0]["plain_text"]
+        )
+
+        if company := self.page_data["properties"]["Company"]["rich_text"]:
+            company_str = company[0]["plain_text"]
+        else:
+            company_str = "?"
+
+        if time_delta.days >= 2:
+            time_delta_str = f"{time_delta.days} days"
+        elif time_delta.days >= 1:
+            time_delta_str = f"{time_delta.days} day"
+        elif time_delta.seconds > 60 * 60:
+            time_delta_str = f"{time_delta.seconds // (60*60)} hours"
+        else:
+            time_delta_str = f"{time_delta.seconds // 60} minutes"
+
+        return {
+            "title": title,
+            "company": company_str,
+            "age": time_delta_str,
+            "remaining": self.remaining_count,
+        }
 
     def check_duplicate_page(self) -> bool:
         """
@@ -117,9 +123,8 @@ class Notion:
         - it has the same URL, or
         - it has the same title and company
         """
-
         # LinkedIn URL
-        url = self.page["properties"]["URL"]["url"]
+        url = self.page_data["properties"]["URL"]["url"]
         assert url, "[Notion] Check failed. URL is empty."
 
         # Add or remove trailing slash
@@ -127,8 +132,8 @@ class Notion:
             url_ts = url[:-1]
         else:
             url_ts = url + "/"
-        title = self.page["properties"]["Position"]["title"][0]["plain_text"]
-        company = self.page["properties"]["Company"]["rich_text"]
+        title = self.page_data["properties"]["Position"]["title"][0]["plain_text"]
+        company = self.page_data["properties"]["Company"]["rich_text"]
         company_str = company[0]["plain_text"] if company else "COMPANY NOT SET"
         query = self._query_db(
             filter={
@@ -152,7 +157,7 @@ class Notion:
             err_str = "❌ **Duplicate found. Posting has duplicate with same Title+Company or same URL:**\n"
             for page in query["results"]:
                 err_str += f"  - [{page['url']}]({page['url']})\n"
-            st.warning(err_str)
+            st.error(err_str)
             return False
         return True
 
@@ -174,10 +179,10 @@ class Notion:
         )
         # Check if there is more than one page
         if len(query["results"]) != 0:
-            err_str = "[📂] **No CV attached. These postings are marked as 'Applied' but have no uploaded document:**\n"
+            err_str = "❌ **No CV attached. These postings are marked as 'Applied' but have no uploaded document:**\n"
             for page in query["results"]:
                 err_str += f"  - {page['url']}\n"
-            st.warning(err_str)
+            st.error(err_str)
             return False
         return True
 
@@ -187,18 +192,17 @@ class Notion:
         - City: if label is non-empty
         - Company: if text is non-empty
         """
-
         # def _check_property_city():
-        #     if not self.page["properties"]["City"]["select"]:
+        #     if not self.page_data["properties"]["City"]["select"]:
         #         st.markdown(
-        #             f"📑 Property *City* in [Notion page]({self.page['url']}) is empty → Reload Streamlit page to check again"
+        #             f"📑 Property *City* in [Notion page]({self.page_data['url']}) is empty → Reload Streamlit page to check again"
         #         )
         #         return False
         #     return True
 
         def _check_property_company():
             err_message = st.empty()
-            if not self.page["properties"]["Company"]["rich_text"]:
+            if not self.page_data["properties"]["Company"]["rich_text"]:
                 err_message.markdown(
                     f"📑 Property *Company* in Notion page is empty → Edit Notion page and rerun checks"
                 )
@@ -220,7 +224,7 @@ class Notion:
                 )
                 return True
 
-        url = self.page["properties"]["URL"]["url"]
+        url = self.page_data["properties"]["URL"]["url"]
 
         query = self._query_db(
             filter={
@@ -257,7 +261,7 @@ class Notion:
 
     def get_descr(self):
         response = self.notion.request(
-            path=f"pages/{self.page['id']}/markdown", method="get"
+            path=f"pages/{self.page_data['id']}/markdown", method="get"
         )
         all_markdown = response.get("markdown", "")
         # Handle truncated or unknown blocks
@@ -283,8 +287,10 @@ class Notion:
         This is your turn to apply at...
         ```
         """
-        job_title = self.page["properties"]["Position"]["title"][0]["plain_text"]
-        job_company = self.page["properties"]["Company"]["rich_text"][0]["plain_text"]
+        job_title = self.page_data["properties"]["Position"]["title"][0]["plain_text"]
+        job_company = self.page_data["properties"]["Company"]["rich_text"][0][
+            "plain_text"
+        ]
         res = "# Job Properties\n"
         res += f"Title: {job_title}\n"
         res += f"Company: {job_company}\n"
@@ -307,22 +313,22 @@ class Notion:
             raise KeyError(
                 "[❌] LLM - Prompt output with incorrect formatting. Check prompt above."
             )
-        title = self.page["properties"]["Position"]["title"][0]["plain_text"]
-        stage = self.page["properties"]["Stage"]["select"]["name"]
-        url = self.page["properties"]["URL"]["url"]
-        date = self.page["properties"]["_Day"]["date"]["start"]
+        title = self.page_data["properties"]["Position"]["title"][0]["plain_text"]
+        stage = self.page_data["properties"]["Stage"]["select"]["name"]
+        url = self.page_data["properties"]["URL"]["url"]
+        date = self.page_data["properties"]["_Day"]["date"]["start"]
         properties = {
             "Position": {"title": [{"text": {"content": title}}]},
             "Stage": {"select": {"name": stage}},
             "URL": {"url": url},
             "_Day": {"date": {"start": date}},
         }
-        if company := self.page["properties"]["Company"]["rich_text"]:
+        if company := self.page_data["properties"]["Company"]["rich_text"]:
             properties["Company"] = {
                 "rich_text": [{"text": {"content": company[0]["plain_text"]}}]
             }
         # Deprecated, but kept in case I'll reuse it in the future
-        if city := self.page["properties"]["City"]["select"]:
+        if city := self.page_data["properties"]["City"]["select"]:
             properties["City"] = {"select": {"name": city["name"]}}
 
         notion_page = self.notion.pages.create(
@@ -336,7 +342,7 @@ class Notion:
     def delete_page(self) -> None:
         """Move notion from database to trash."""
         self.notion.pages.update(
-            page_id=self.page["id"],
+            page_id=self.page_data["id"],
             archived=True,
         )
         self.page = None
@@ -346,7 +352,7 @@ class Notion:
         # If time is before 6am set as previous day
         date = (datetime.datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")
         self.notion.pages.update(
-            page_id=self.page["id"],
+            page_id=self.page_data["id"],
             properties={
                 "Stage": {"select": {"name": "Applied"}},
                 "_Day": {"date": {"start": date}},
