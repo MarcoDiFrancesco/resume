@@ -250,6 +250,11 @@ class Notion:
         title = self.page_data["properties"]["Position"]["title"][0]["plain_text"]
         stage = self.page_data["properties"]["Stage"]["select"]["name"]
         url = self.page_data["properties"]["URL"]["url"]
+        # Strip tracking query parameters from LinkedIn URLs
+        # e.g. linkedin.com/jobs/view/123/?ref=abc -> linkedin.com/jobs/view/123/
+        if url and url.startswith("https://www.linkedin.com/") and "?" in url:
+            url = url.split("?")[0]
+            st.write("✅ Cleaned LinkedIn URL parameters.")
         date = self.page_data["properties"]["_Day"]["date"]["start"]
         properties = {
             "Position": {"title": [{"text": {"content": title}}]},

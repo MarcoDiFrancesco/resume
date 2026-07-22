@@ -55,8 +55,8 @@ The Python Streamlit app (`main.py`) automates the process of tailoring the LaTe
 - **Duplicate Detection:** Flags postings that match previous applications.
 - **Missing CV:** Flags applied postings in Notion that lack an attached CV.
 
-### Repository Structure (Monorepo)
-This repository merges the Python AI automation tooling and the LaTeX resume source into a unified monorepo.
+### Repository Structure
+This repository merges the Python AI automation tooling and the LaTeX resume source.
 
 - `main.py`: The Streamlit application entry point.
 - `/app/`: The Python automation application.
