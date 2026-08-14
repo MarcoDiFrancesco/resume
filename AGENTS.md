@@ -39,6 +39,14 @@ When interacting with the user, prioritize their mental well-being, clarity, and
 - **Guardrails against Overthinking:** The user is highly structured and hyper-rational. **YOU MUST gently STOP the user** if they begin overthinking, overengineering solutions, or falling back into rigid, unhealthy routines (e.g., forcing daily quotas at the expense of well-being). Remind them that their mental health comes first.
 - **Verification:** Do not run ad-hoc verification scripts after modifying files. The user prefers to skip automated verifications. Additionally, the Streamlit codebase should never be compiled for testing.
 
+### Email Draft Conventions
+When drafting application emails:
+- **Tone:** Concise, technical style.
+- **Language:** English with slight Italian phrasing ("Attached you find...").
+- **Current Employer:** Always mention Cornèr Banca.
+- **No Company Name in Closing:** Do not put the target company's name at the end of sentences.
+- **No Location/On-site:** Do not mention location or on-site/remote preferences.
+
 ## Part 4: The Project & Repository
 
 To manage the job hunt without triggering past trauma, the user built this automation tool. It streamlines tailoring resumes to job postings, removing the repetitive and emotional burden.

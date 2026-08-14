@@ -75,9 +75,8 @@ def tailoring_check(notion: Notion) -> bool:
 
 def tailoring_update(notion: Notion, is_valid: bool):
     """Display buttons for updating resume, cover letter, and email."""
-    if is_valid:
-        page_descr = notion.get_descr_with_props()
-        copy_text_to_file(page_descr, JOB_DESCRIPTION_FILE)
+    page_descr = notion.get_descr_with_props()
+    copy_text_to_file(page_descr, JOB_DESCRIPTION_FILE)
 
     button_config = {
         "type": "primary",
@@ -99,10 +98,10 @@ def tailoring_update(notion: Notion, is_valid: bool):
 
 def tailoring_conclusion(notion: Notion):
     """Display button for updating applied status and uploading resume."""
-    st.header("Conclusion")
+    st.header("Applying")
 
     if st.button(
-        "✅ Set Applied & Upload Resume",
+        "✅ Notion: Set Applied & Upload Resume",
         type="primary",
         use_container_width=True,
     ):

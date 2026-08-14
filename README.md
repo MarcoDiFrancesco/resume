@@ -46,3 +46,20 @@ A local web application that connects to Notion to manage the application workfl
     <img src="docs/images/home-screenshot-3.png" alt="home-screenshot-3">
   </kbd>
 </div>
+
+## Notion
+
+<div align="center">
+  <kbd>
+    <img src="docs/images/notion-1.png" alt="notion-1">
+  </kbd>
+</div>
+
+## Implementation Backlog
+
+### 1. Observability Stack (Grafana + Prometheus)
+- **Target File:** `latex/cv/6-projects.tex`
+- **Stack:** Grafana, Prometheus
+- **Scope:** Metrics scraping, dashboard visualization, and infrastructure monitoring.
+
+  **🔲 TODO**
