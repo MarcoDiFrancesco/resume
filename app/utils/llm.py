@@ -25,6 +25,7 @@ class Llm:
                 },
             ],
         )
+        assert response.choices[0].message.content, "Error in query generation"
         return response.choices[0].message.content
 
     def fetch_requirements(self, page_content: str):
@@ -43,10 +44,10 @@ class Llm:
             "req_stud": f"Check if the candidate is required to be currently enrolled at the university. {req_explain_prompt}. If required return: '❌ Student status required: ...'. Otherwise: '➡️ Current university student status requirement passed'",
             "req_phd": "Check if a PhD degree is strictly required. If so: '❌ PhD position required'. Otherwise: '➡️ PhD requirement passed'",
             "req_years": f"""
-                Check if 4+ years of experience are required.
+                Check if over 5 years of experience are required.
                 {req_explain_prompt}
                 If required:     '❌ Years of experience required: ...'
-                For example:     '❌ Years of experience required: 5 years in Devops, 4 in ML'
+                For example:     '❌ Years of experience required: 6 years in Devops, 9 in ML'
                 If not required: '➡️ Years of experience requirement passed'
             """,
             "req_ml": "Check if this position includes working with statistical models, like training or deploying machine learning models or AI models. If so: '➡️ Machine Learning included'. Otherwise: '❌ No mentions of Machine Learning'",

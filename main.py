@@ -25,7 +25,10 @@ def main():
         st.header("Tailoring")
         if notion and notion.page:
             tailoring.tailoring_links(notion)
+            # Not checking anymore for bold-italic. Now it is now optional.
+            # TODO: In the future remove the 'is_valid' check
             is_valid = tailoring.tailoring_check(notion)
+            is_valid = True
             tailoring.tailoring_update(notion, is_valid)
             tailoring.tailoring_conclusion(notion)
         else:
