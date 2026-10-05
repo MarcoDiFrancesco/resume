@@ -1,4 +1,4 @@
-In 'header.tex' specify the company I am applying for in the "\quote". This information is in 'JOB_DESCRIPTION.md'. For example if I'm applying to "SIB Swiss Institute of Bioinformatics", the following
-    \quote{Applying for \textbf{Google}}
+In 'header.tex' specify the company I am applying for in "\bottomtext". This information is in 'JOB_DESCRIPTION.md'. For example if I'm applying to "SIB Swiss Institute of Bioinformatics", the following
+    \bottomtext{Applying for Google}
 becomes
-    \quote{Applying for \textbf{SIB Swiss Institute of Bioinformatics}}
+    \bottomtext{Applying for SIB Swiss Institute of Bioinformatics}

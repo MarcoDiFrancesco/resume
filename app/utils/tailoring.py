@@ -84,6 +84,20 @@ def tailoring_update(notion: Notion, is_valid: bool):
         "use_container_width": True,
     }
 
+    auto_update = st.checkbox("Update resume automatically", key="auto_update")
+
+    current_page_id = notion.page_data["id"]
+    if (
+        auto_update
+        and is_valid
+        and st.session_state.get("last_auto_updated_page_id") != current_page_id
+    ):
+        st.session_state["last_auto_updated_page_id"] = current_page_id
+        with st.spinner("Auto-updating Resume..."):
+            reset_git_changes(RESUME_FILES)
+            aider.update_resume()
+            compile_latex(RESUME_MAIN_FILE)
+
     if st.button("1️⃣ Update Resume", **button_config):
         reset_git_changes(RESUME_FILES)
         aider.update_resume()

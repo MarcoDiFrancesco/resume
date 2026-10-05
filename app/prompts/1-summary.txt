@@ -6,6 +6,7 @@ Intrustions:
 
 In section 'Summary':
 - Update summary mentioning my skill and my work experience relevant for this job.
+- Change a few words, don't rewrite the whole description.
 - Do not mention specific technologies like Docker, Python, etc.
 - Do not mention the paper publication.
 - Write max 100 words.

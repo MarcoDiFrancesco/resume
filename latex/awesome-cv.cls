@@ -351,6 +351,11 @@
 % Usage: \quote{<quote>}
 \renewcommand*{\quote}[1]{\def\@quote{#1}}
 
+% Defines bottom text for footer (optional)
+% Usage: \bottomtext{<text>}
+\newcommand*{\thebottomtext}{}
+\newcommand*{\bottomtext}[1]{\def\thebottomtext{#1}}
+
 % Defines recipient's information (cover letter only)
 % Usage: \recipient{<recipient name>}{<recipient address>}
 % Usage: \recipientname{<recipient name>}
