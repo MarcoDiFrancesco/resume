@@ -69,11 +69,15 @@ This repository merges the Python AI automation tooling and the LaTeX resume sou
 - `main.py`: The Streamlit application entry point.
 - `/app/`: The Python automation application.
   - `config.py`: Centralized configuration, model settings, and file paths.
-  - `utils/`: Core Python modules (`notion.py`, `aider.py`, `posting.py`, `helpers.py`).
-  - `prompts/`: Static instruction templates used for LLM interactions.
+  - `utils/`: Core Python modules (`notion.py`, `aider.py`, `posting.py`, `helpers.py`, `llm.py`, `tailoring.py`).
+  - `prompts/`: Static instruction templates used for LLM interactions (`1-summary.txt`, `4-technologies.txt`, etc.).
   - `data/`: Auto-generated, temporary markdown files (e.g., job descriptions) [Gitignored].
 - `/latex/`: The LaTeX resume and cover letter source.
   - `resume.tex`, `coverletter.tex`: Main entry points.
-  - `cv/`: TeX fragments for different resume sections.
-  - `build/`: Auto-generated compilation artifacts (including the final `.pdf` files) [Gitignored].
-- `/docs/`: Documentation and assets (e.g. application screenshots).
+  - `header.tex`: Personal info, links, and styling setup.
+  - `awesome-cv.cls`: Resume document class.
+  - `cv/`: TeX fragments for resume sections (`1-summary.tex`, `2-work.tex`, `3-education.tex`, `4-technologies.tex`, `5-keywords.tex`, `6-projects.tex`, `7-extracurricular.tex`).
+  - `assets/`: Profile photo and static assets.
+  - `fonts/`: Font Awesome and Roboto font files.
+  - `build/`: Auto-generated compilation artifacts (including `.pdf` files) [Gitignored].
+- `/docs/`: Documentation and screenshots.

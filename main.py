@@ -34,6 +34,8 @@ def main():
         else:
             st.info("No active posting. Add new postings to Notion DB.")
 
+    tailoring.tailoring_pdf_preview()
+
 
 if __name__ == "__main__":
     main()

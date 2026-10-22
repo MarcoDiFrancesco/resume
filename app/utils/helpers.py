@@ -47,14 +47,14 @@ def reset_git_changes(fnames):
             st.text(f"[📌] Git changes in '{fname}' were reset.")
 
 
-def compile_latex(file_path: str):
+def compile_latex(file_path: str) -> bool:
     """
     Compile a LaTeX file using lualatex.
     """
     path = Path(file_path)
     if not path.exists():
         st.error(f"LaTeX file not found: {file_path}")
-        return
+        return False
 
     work_dir = path.parent
     file_name = path.name
@@ -77,11 +77,14 @@ def compile_latex(file_path: str):
 
             if result.returncode == 0:
                 st.success(f"Successfully compiled {file_name}")
+                return True
             else:
                 st.error(f"Failed to compile {file_name}")
                 with st.expander("Compilation Logs"):
                     st.code(result.stdout)
                     if result.stderr:
                         st.code(result.stderr)
+                return False
         except Exception as e:
             st.error(f"Error compiling LaTeX: {str(e)}")
+            return False

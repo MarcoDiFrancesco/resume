@@ -1,10 +1,15 @@
+from pathlib import Path
+
 import streamlit as st
+from streamlit_pdf_viewer import pdf_viewer
 
 from app.config import (
     COVER_LETTER_FILE,
+    COVER_LETTER_PDF_FILE,
     JOB_DESCRIPTION_FILE,
     RESUME_FILES,
     RESUME_MAIN_FILE,
+    RESUME_PDF_FILE,
 )
 from app.utils import aider
 from app.utils.helpers import (
@@ -123,3 +128,57 @@ def tailoring_conclusion(notion: Notion):
             file_id = notion.upload_pdf_resume()
             notion.set_applied_and_date(file_id=file_id)
         st.success("Successfully set as applied and uploaded resume!")
+
+
+def tailoring_pdf_preview():
+    """Display Resume and Cover Letter PDF previews side-by-side below columns."""
+    resume_path = Path(RESUME_PDF_FILE)
+    cover_path = Path(COVER_LETTER_PDF_FILE)
+
+    if not resume_path.exists() and not cover_path.exists():
+        return
+
+    st.divider()
+
+    st.markdown(
+        """
+        <style>
+        iframe[data-testid="stCustomComponentV1"] {
+            border: 1px solid #d0d7de !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+            border-radius: 6px !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    col_resume, col_cover = st.columns(2)
+
+    with col_resume:
+        with st.container(border=True):
+            st.subheader("Resume")
+            if resume_path.exists():
+                pdf_viewer(
+                    input=resume_path.read_bytes(),
+                    width="100%",
+                    zoom_level=1.25,
+                    render_text=True,
+                    key=f"pdf_resume_{resume_path.stat().st_mtime}",
+                )
+            else:
+                st.info("Resume not compiled yet.")
+
+    with col_cover:
+        with st.container(border=True):
+            st.subheader("Cover Letter")
+            if cover_path.exists():
+                pdf_viewer(
+                    input=cover_path.read_bytes(),
+                    width="100%",
+                    zoom_level=1.25,
+                    render_text=True,
+                    key=f"pdf_cover_{cover_path.stat().st_mtime}",
+                )
+            else:
+                st.info("Cover letter not compiled yet.")

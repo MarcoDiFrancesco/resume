@@ -7,6 +7,8 @@ NOTION_PURPOSE_PAGE_URL = "https://www.notion.so/marcodifrancesco/Finding-My-Pur
 RESUME_MAIN_FILE = "latex/resume.tex"
 COVER_LETTER_FILE = "latex/coverletter.tex"
 JOB_DESCRIPTION_FILE = "app/data/JOB_DESCRIPTION.md"
+RESUME_PDF_FILE = "latex/build/resume.pdf"
+COVER_LETTER_PDF_FILE = "latex/build/coverletter.pdf"
 
 RESUME_FILES = [
     "latex/cv/1-summary.tex",
