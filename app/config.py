@@ -33,6 +33,7 @@ AIDER_SCRIPT_PATH = "/home/marco/scripts/aider"
 AIDER_MODEL = "openai/vertex_ai/gemini-3.1-pro-preview"
 
 # LLM model names
+DECISION_MODEL = "openai/gpt-6-luna"
 GEMINI_FLASH_MODEL = "vertex_ai/gemini-3.8-flash"
 GEMINI_FLASH_LITE_MODEL = "vertex_ai/gemini-3.1-flash-lite"
 

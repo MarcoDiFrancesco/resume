@@ -69,7 +69,7 @@ This repository merges the Python AI automation tooling and the LaTeX resume sou
 - `main.py`: The Streamlit application entry point.
 - `/app/`: The Python automation application.
   - `config.py`: Centralized configuration, model settings, and file paths.
-  - `utils/`: Core Python modules (`notion.py`, `aider.py`, `posting.py`, `helpers.py`, `llm.py`, `tailoring.py`).
+  - `utils/`: Core Python modules (`notion.py`, `aider.py`, `posting.py`, `helpers.py`, `decisions.py`, `completion.py`, `tailoring.py`).
   - `prompts/`: Static instruction templates used for LLM interactions (`1-summary.txt`, `4-technologies.txt`, etc.).
   - `data/`: Auto-generated, temporary markdown files (e.g., job descriptions) [Gitignored].
 - `/latex/`: The LaTeX resume and cover letter source.

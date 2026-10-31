@@ -3,11 +3,12 @@ import os
 import streamlit as st
 
 from app.config import NOTION_PURPOSE_PAGE_URL, RESUME_MAIN_FILE
+from app.utils.completion import clean_markdown_description
+from app.utils.decisions import display_posting_requirements
 from app.utils.helpers import (
     files_exist,
     page_is_underlined,
 )
-from app.utils.llm import Llm
 from app.utils.notion import Notion
 
 
@@ -125,16 +126,14 @@ def posting_info(_notion: Notion):
 
 @st.cache_data
 def posting_requirements(_notion: Notion):
-    """Fetch and display posting requirements using LLM."""
-    llm = Llm()
+    """Fetch and display posting requirements using Decisions API."""
     page_descr = _notion.get_descr()
-    llm.fetch_requirements(page_descr)
+    display_posting_requirements(page_descr)
 
 
 @st.cache_data
 def posting_fix_markdown(_notion: Notion):
     """Format and rewrite Notion page description using LLM if needed."""
-    llm = Llm()
     page_descr = _notion.get_descr()
 
     with st.expander("Markdown fix with LLM", icon="🗣️"):
@@ -149,7 +148,7 @@ def posting_fix_markdown(_notion: Notion):
                 )
             )
         else:
-            page_descr_new = llm.query_page_descr(page_descr)
+            page_descr_new = clean_markdown_description(page_descr)
             c1, c2 = st.columns([1, 1])
             with c1:
                 st.text("📝 Old description")
@@ -169,7 +168,6 @@ def posting_fix_markdown(_notion: Notion):
 def _clean_all_pages_md():
     """Clean markdown for all pages in the Notion database."""
     notion = Notion(os.environ["NOTION_DB_ID"])
-    llm = Llm()
 
     pages = notion.get_all_pages()
     st.info(f"Found {len(pages)} pages to process.")
@@ -180,7 +178,7 @@ def _clean_all_pages_md():
         page_descr = notion.get_descr()
 
         if not page_is_underlined(page_descr):
-            page_descr_new = llm.query_page_descr(page_descr)
+            page_descr_new = clean_markdown_description(page_descr)
             notion.new_page(page_descr_new)
             notion.delete_page()
         progress_bar.progress((i + 1) / len(pages))
