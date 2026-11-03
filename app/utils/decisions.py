@@ -32,6 +32,11 @@ DECISION_QUESTIONS = [
         "type": "predicate",
     },
     {
+        "name": "has_k8s",
+        "instructions": "Does this job description mention explicitly kubernetes?",
+        "type": "predicate",
+    },
+    {
         "name": "req_letter",
         "instructions": "Is a cover letter or motivation letter explicitly required?",
         "type": "predicate",
@@ -68,6 +73,10 @@ STATUS_MAPPINGS = {
     "has_ml": {
         True: "➡️ ML/AI included",
         False: "❌ No ML/AI mentioned",
+    },
+    "has_k8s": {
+        True: "➡️ Kubernetes included",
+        False: "❌ No Kubernetes mentioned",
     },
     "req_letter": {
         True: "✅ Letter required",
@@ -120,7 +129,14 @@ def display_posting_requirements(page_content: str) -> None:
                     "Category": "Years",
                     "Status": STATUS_MAPPINGS["req_years"][reqs["req_years"]],
                 },
-                {"Category": "ML", "Status": STATUS_MAPPINGS["has_ml"][reqs["has_ml"]]},
+                {
+                    "Category": "ML",
+                    "Status": STATUS_MAPPINGS["has_ml"][reqs["has_ml"]],
+                },
+                {
+                    "Category": "K8s",
+                    "Status": STATUS_MAPPINGS["has_k8s"][reqs["has_k8s"]],
+                },
             ],
             column_config={
                 "Category": st.column_config.TextColumn(None),
